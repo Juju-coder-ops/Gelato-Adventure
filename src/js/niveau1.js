@@ -2,6 +2,7 @@ import * as fct from "/src/js/fonctions.js";
 var player;
 var clavier;
 var gameOver = false;
+var sautCount = 0;
 
 
 export default class niveau1 extends Phaser.Scene {
@@ -102,7 +103,7 @@ export default class niveau1 extends Phaser.Scene {
 
     // timer de spawn
     this.timerGlace = this.time.addEvent({
-      delay: 1000,
+      delay: 2000,
       callback: spawnGlace,
       callbackScope: this,
       loop: true
@@ -124,17 +125,16 @@ export default class niveau1 extends Phaser.Scene {
       player.setVelocityX(0);
       player.anims.play("anim_face");
     }
+    if (player.body.blocked.down) {
+      sautCount = 0;
+    }
 
-    if (clavier.up.isDown && player.body.blocked.down) {
-      player.setVelocityY(-250);
+    if (Phaser.Input.Keyboard.JustDown(clavier.up) && sautCount < 2) {
+      player.setVelocityY(-320);
+      sautCount++;
     }
   }
-
-
 }
-
-
-
 function spawnGlace() {
   if (gameOver) return;
 
@@ -142,7 +142,9 @@ function spawnGlace() {
   var glace = this.glaces.create(x, 0, "img_glace");
 
   glace.setBounce(0.3);
-  glace.setVelocity(Phaser.Math.Between(-50, 50), 200);
+  glace.setVelocity(Phaser.Math.Between(-50, 50), 150);
+  glace.setScale(0.7);
+
 }
 
 function toucheGlace(player, glace) {
@@ -166,3 +168,4 @@ function toucheGlace(player, glace) {
     fill: "#ff0000"
   }).setDepth(100);
 }
+
