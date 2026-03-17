@@ -9,30 +9,9 @@ export default class niveau1 extends Phaser.Scene {
   }
 }
 
-mvar player;
+var player;
 var clavier;
 var gameOver = false;
-
-var config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  backgroundColor: "#87ceeb",
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 300 },
-      debug: true
-    }
-  },
-  scene: {
-    preload: preload,
-    create: create,
-    update: update
-  }
-};
-
-new Phaser.Game(config);
 
 function preload() {
   this.load.spritesheet("img_perso", "src/assets/dude.png", {
