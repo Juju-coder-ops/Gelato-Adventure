@@ -8,7 +8,6 @@ export default class niveau1 extends Phaser.Scene {
     });
   }
 }
-
 var player;
 var clavier;
 var gameOver = false;
