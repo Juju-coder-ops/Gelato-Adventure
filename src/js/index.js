@@ -45,7 +45,7 @@ function create() {
   const tilesetSable = carteDuNiveau.addTilesetImage("tuile sable", "Phaser_tuile_sable");
   const tilesetPlage = carteDuNiveau.addTilesetImage("tuile_plage", "Phaser_tuile_plage");
 
-      const calque_jeu = carteDuNiveau.createLayer(
+  const calque_jeu = carteDuNiveau.createLayer(
     "Calque de Tuiles 1",
     [tilesetAncien, tilesetSable, tilesetPlage],
     0,
@@ -67,6 +67,8 @@ function create() {
   player.setBounce(0.2);
 
   this.physics.add.collider(player, calque_plateformes);
+  this.physics.add.collider(player, calque_jeu);
+
 
   clavier = this.input.keyboard.createCursorKeys();
 
@@ -100,6 +102,8 @@ function create() {
 
   this.physics.add.collider(this.glaces, calque_plateformes);
   this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
+
+
 
   // timer de spawn
   this.timerGlace = this.time.addEvent({
