@@ -6,51 +6,143 @@ export default class niveau3 extends Phaser.Scene {
       key: "niveau3" //  ici on précise le nom de la classe en tant qu'identifiant
     });
   }
-  preload() {}
-
-  create() {
-    this.add.image(400, 300, "img_ciel");
-    this.groupe_plateformes = this.physics.add.staticGroup();
-    this.groupe_plateformes.create(200, 584, "img_plateforme");
-    this.groupe_plateformes.create(600, 584, "img_plateforme");
-    // ajout d'un texte distintcif  du niveau
-    this.add.text(400, 100, "Vous êtes dans le niveau 3", {
-      fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif',
-      fontSize: "22pt"
-    });
-
-    this.porte_retour = this.physics.add.staticSprite(100, 550, "img_porte3");
-
-    this.player = this.physics.add.sprite(100, 450, "img_perso");
-    this.player.refreshBody();
-    this.player.setBounce(0.2);
-    this.player.setCollideWorldBounds(true);
-    this.clavier = this.input.keyboard.createCursorKeys();
-    this.physics.add.collider(this.player, this.groupe_plateformes);
-  }
-
-  update() {
-    if (this.clavier.left.isDown) {
-      this.player.setVelocityX(-160);
-      this.player.anims.play("anim_tourne_gauche", true);
-    } else if (this.clavier.right.isDown) {
-      this.player.setVelocityX(160);
-      this.player.anims.play("anim_tourne_droite", true);
-    } else {
-      this.player.setVelocityX(0);
-      this.player.anims.play("anim_face");
-    }
-    if (this.clavier.up.isDown && this.player.body.touching.down) {
-      this.player.setVelocityY(-330);
-    }
-
-    if (Phaser.Input.Keyboard.JustDown(this.clavier.space) == true) {
-      if (this.physics.overlap(this.player, this.porte_retour)) {
-        console.log("niveau 3 : retour vers selection");
-        this.scene.switch("selection");
-      }
-    }
-  }
 }
 
+var player;
+var clavier;
 
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  backgroundColor: "#87ceeb",
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: {
+    preload: preload,
+    create: create,
+    update: update
+  }
+};
+
+new Phaser.Game(config);
+
+function preload() {
+  console.log("preload lancé");
+
+  this.load.spritesheet("img_perso", "src/assets/dude.png", {
+    frameWidth: 32,
+    frameHeight: 48
+  });
+
+  // TES TILESETS
+  this.load.image("fondneige", "src/assets/fondneige.png");
+  this.load.image("blocneige", "src/assets/blocneige.png");
+  this.load.image("objetneige", "src/assets/objetneige.png");
+
+  // TA MAP
+  this.load.tilemapTiledJSON("map_montagne", "src/assets/montagne.tiled-project.tmj");
+}
+
+function create() {
+  console.log("create lancé");
+
+  const carteDuNiveau = this.add.tilemap("map_montagne");
+
+  // 🔥 IMPORTANT : noms EXACTS de Tiled + tes clés
+  const tilesetFond = carteDuNiveau.addTilesetImage(
+    "ChatGPT Image 17 mars 2026, 11_15_41",
+    "fondneige"
+  );
+
+  const tilesetBloc = carteDuNiveau.addTilesetImage(
+    "ChatGPT Image 17 mars 2026, 11_47_33",
+    "blocneige"
+  );
+
+  const tilesetObjet = carteDuNiveau.addTilesetImage(
+    "ChatGPT Image 17 mars 2026 à 12_01_52",
+    "objetneige"
+  );
+
+  console.log(tilesetFond, tilesetBloc, tilesetObjet);
+
+  // TES CALQUES
+  const calque1 = carteDuNiveau.createLayer(
+    "Calque de Tuiles 1",
+    [tilesetFond, tilesetBloc, tilesetObjet],
+    0,
+    0
+  );
+
+  const calque2 = carteDuNiveau.createLayer(
+    "Calque de Tuiles 2",
+    [tilesetFond, tilesetBloc, tilesetObjet],
+    0,
+    0
+  );
+
+  console.log(calque1, calque2);
+
+  calque1.setCollisionByProperty({ estSolide: true });
+  calque2.setCollisionByProperty({ estSolide: true });
+
+  player = this.physics.add.sprite(100, 100, "img_perso");
+  player.setCollideWorldBounds(true);
+  player.setBounce(0.2);
+
+  this.physics.add.collider(player, calque1);
+  this.physics.add.collider(player, calque2);
+
+  clavier = this.input.keyboard.createCursorKeys();
+
+  this.anims.create({
+    key: "anim_tourne_gauche",
+    frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: "anim_tourne_droite",
+    frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: "anim_face",
+    frames: [{ key: "img_perso", frame: 4 }],
+    frameRate: 20
+  });
+
+  this.physics.world.setBounds(0, 0, 3200, 960);
+  this.cameras.main.setBounds(0, 0, 3200, 960);
+  this.cameras.main.startFollow(player);
+}
+
+function update() {
+  if (!clavier || !player) {
+    return;
+  }
+
+  if (clavier.right.isDown) {
+    player.setVelocityX(160);
+    player.anims.play("anim_tourne_droite", true);
+  } else if (clavier.left.isDown) {
+    player.setVelocityX(-160);
+    player.anims.play("anim_tourne_gauche", true);
+  } else {
+    player.setVelocityX(0);
+    player.anims.play("anim_face");
+  }
+
+  if (clavier.up.isDown && player.body.blocked.down) {
+    player.setVelocityY(-250);
+  }
+}
