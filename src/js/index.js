@@ -1,3 +1,4 @@
+
 var player;
 var clavier;
 var gameOver = false;
@@ -120,9 +121,9 @@ function create() {
 }
 
 function update() {
-  if (gameOver) return;
-
-  if (!clavier || !player) return;
+  if (!clavier || !player) {
+    return;
+  }
 
   if (clavier.right.isDown) {
     player.setVelocityX(160);
@@ -138,36 +139,4 @@ function update() {
   if (clavier.up.isDown && player.body.blocked.down) {
     player.setVelocityY(-250);
   }
-}
-
-function spawnGlace() {
-  if (gameOver) return;
-
-  var x = Phaser.Math.Between(0, 800);
-  var glace = this.glaces.create(x, 0, "img_glace");
-
-  glace.setBounce(0.3);
-  glace.setVelocity(Phaser.Math.Between(-50, 50), 200);
-}
-
-function toucheGlace(player, glace) {
-  if (gameOver) return;
-
-  gameOver = true;
-
-  this.physics.pause();
-  this.timerGlace.remove();
-
-  player.setTint(0xff0000);
-
-  this.tweens.add({
-    targets: player,
-    alpha: 0,
-    duration: 500
-  });
-
-  this.add.text(player.x - 100, player.y - 50, "GAME OVER", {
-    fontSize: "48px",
-    fill: "#ff0000"
-  }).setDepth(100);
 }
