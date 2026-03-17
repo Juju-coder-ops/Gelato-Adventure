@@ -1,5 +1,6 @@
 var player;
 var clavier;
+var gameOver = false;
 
 var config = {
   type: Phaser.AUTO,
@@ -28,7 +29,6 @@ function preload() {
     frameHeight: 48
   });
 
-  // 👉 AJOUT GLACE
   this.load.image("img_glace", "src/assets/glace.png");
 
   this.load.image("Phaser_tuile_plage", "src/assets/tuile_plage.png");
@@ -88,17 +88,14 @@ function create() {
   this.cameras.main.setBounds(0, 0, 2000, 600);
   this.cameras.main.startFollow(player);
 
-  // 👉 GROUPE DE GLACES
+  // groupe de glaces
   this.glaces = this.physics.add.group();
 
-  // collision avec le sol
   this.physics.add.collider(this.glaces, calque_plateformes);
-
-  // collision joueur → mort
   this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
 
-  // 👉 spawn toutes les 1s
-  this.time.addEvent({
+  // timer de spawn
+  this.timerGlace = this.time.addEvent({
     delay: 1000,
     callback: spawnGlace,
     callbackScope: this,
@@ -107,6 +104,8 @@ function create() {
 }
 
 function update() {
+  if (gameOver) return;
+
   if (!clavier || !player) return;
 
   if (clavier.right.isDown) {
@@ -125,19 +124,34 @@ function update() {
   }
 }
 
-// 👉 FAIRE TOMBER UNE GLACE
 function spawnGlace() {
-  var x = Phaser.Math.Between(0, 800);
+  if (gameOver) return;
 
+  var x = Phaser.Math.Between(0, 800);
   var glace = this.glaces.create(x, 0, "img_glace");
 
   glace.setBounce(0.3);
   glace.setVelocity(Phaser.Math.Between(-50, 50), 200);
 }
 
-// 👉 GAME OVER
 function toucheGlace(player, glace) {
+  if (gameOver) return;
+
+  gameOver = true;
+
   this.physics.pause();
+  this.timerGlace.remove();
+
   player.setTint(0xff0000);
-  player.anims.play("anim_face");
+
+  this.tweens.add({
+    targets: player,
+    alpha: 0,
+    duration: 500
+  });
+
+  this.add.text(player.x - 100, player.y - 50, "GAME OVER", {
+    fontSize: "48px",
+    fill: "#ff0000"
+  }).setDepth(100);
 }
