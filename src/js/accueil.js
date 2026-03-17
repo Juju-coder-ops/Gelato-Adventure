@@ -24,11 +24,7 @@ export default class accueil extends Phaser.Scene {
     }).setInteractive();
 
     boutonJouer.on("pointerdown", () => {
-        lancerLeJeu(); 
+        this.scene.start("niveau1"); 
     });
    }
-}
-
-function lancerLeJeu() {
-    console.log("Le jeu doit se lancer ici !");
 }
