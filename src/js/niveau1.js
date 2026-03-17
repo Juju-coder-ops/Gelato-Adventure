@@ -8,30 +8,10 @@ export default class niveau1 extends Phaser.Scene {
     });
   }
 }
-  var player;
+
+var player;
 var clavier;
 var gameOver = false;
-
-var config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  backgroundColor: "#87ceeb",
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 300 },
-      debug: true
-    }
-  },
-  scene: {
-    preload: preload,
-    create: create,
-    update: update
-  }
-};
-
-new Phaser.Game(config);
 
 function preload() {
   this.load.spritesheet("img_perso", "src/assets/dude.png", {
@@ -82,7 +62,7 @@ function create() {
 
   clavier = this.input.keyboard.createCursorKeys();
 
-
+  // animations
   this.anims.create({
     key: "anim_tourne_gauche",
     frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
@@ -107,13 +87,17 @@ function create() {
   this.cameras.main.setBounds(0, 0, 3000, 960);
   this.cameras.main.startFollow(player);
 
+  // groupe de glaces
   this.glaces = this.physics.add.group();
 
   this.physics.add.collider(this.glaces, calque_plateformes);
   this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
 
+
+
+  // timer de spawn
   this.timerGlace = this.time.addEvent({
-    delay: 2000,
+    delay: 1000,
     callback: spawnGlace,
     callbackScope: this,
     loop: true
@@ -121,9 +105,9 @@ function create() {
 }
 
 function update() {
-  if (gameOver) return;
-
-  if (!clavier || !player) return;
+  if (!clavier || !player) {
+    return;
+  }
 
   if (clavier.right.isDown) {
     player.setVelocityX(160);
@@ -139,37 +123,4 @@ function update() {
   if (clavier.up.isDown && player.body.blocked.down) {
     player.setVelocityY(-250);
   }
-}
-
-function spawnGlace() {
-  if (gameOver) return;
-
-  var x = Phaser.Math.Between(0, 800);
-  var glace = this.glaces.create(x, 0, "img_glace");
-
-  glace.setBounce(0.3);
-  glace.setVelocity(Phaser.Math.Between(-50, 50), 150);
-  glace.setScale(0.7);
-}
-
-function toucheGlace(player, glace) {
-  if (gameOver) return;
-
-  gameOver = true;
-
-  this.physics.pause();
-  this.timerGlace.remove();
-
-  player.setTint(0xff0000);
-
-  this.tweens.add({
-    targets: player,
-    alpha: 0,
-    duration: 500
-  });
-
-  this.add.text(player.x - 100, player.y - 50, "GAME OVER", {
-    fontSize: "48px",
-    fill: "#ff0000"
-  }).setDepth(100);
 }
