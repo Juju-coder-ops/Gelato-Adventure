@@ -24,6 +24,8 @@ export default class niveau1 extends Phaser.Scene {
 
     this.load.image("Phaser_tuile_plage", "src/assets/tuile plage.png");
     this.load.image("Phaser_tuile_ancien", "src/assets/tuile_ancien.png");
+    this.load.image("img_porte_sortie", "src/assets/door_exit.png");
+
 
     this.load.tilemapTiledJSON("map_jeu_glace", "src/assets/map_jeu_glace.tmj");
   }
@@ -108,6 +110,15 @@ export default class niveau1 extends Phaser.Scene {
       callbackScope: this,
       loop: true
     });
+
+    this.porte_sortie = this.physics.add.staticSprite(2850, 700, "img_porte_sortie");
+
+
+    this.add.text(2700, 620, "Appuie sur ESPACE", {
+    fontSize: "18px",
+    fill: "#ffffff",
+    backgroundColor: "#000000"
+  });
   }
 
   update() {
@@ -133,6 +144,11 @@ export default class niveau1 extends Phaser.Scene {
       player.setVelocityY(-320);
       sautCount++;
     }
+    if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+    if (this.physics.overlap(player, this.porte_sortie)) {
+    this.scene.start("niveau2");
+  }
+}
   }
 }
 function spawnGlace() {
