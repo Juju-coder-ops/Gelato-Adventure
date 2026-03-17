@@ -1,5 +1,5 @@
-import niveau1 from "./src/js/niveau1.js";
-
+import niveau1 from "./niveau1.js";
+import accueil from "./accueil.js"
 var config = {
   type: Phaser.AUTO,
   width: 800,
@@ -12,7 +12,8 @@ var config = {
       debug: true
     }
   },
-  scene: [niveau1]
+  scene: [accueil, niveau1]
 };
 
-new Phaser.Game(config);
+var g = new Phaser.Game(config);
+

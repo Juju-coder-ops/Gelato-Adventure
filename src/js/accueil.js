@@ -1,20 +1,16 @@
-var configAccueil = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    backgroundColor: "#87ceeb",
-    scene: {
-        preload: preload,
-        create: create
-    }
-};
 
-var gameAccueil = new Phaser.Game(configAccueil);
+export default class accueil extends Phaser.Scene {
 
-function preload() {
+ constructor() {
+    super({
+      key: "accueil" //  ici on précise le nom de la classe en tant qu'identifiant
+    });
+  }
+
+ preload() {
 }
 
-function create() {
+ create() {
     this.add.text(150, 200, "Bienvenue sur Gelato Adventure", {
         fontSize: "40px",
         fill: "#000"
@@ -30,6 +26,7 @@ function create() {
     boutonJouer.on("pointerdown", () => {
         lancerLeJeu(); 
     });
+   }
 }
 
 function lancerLeJeu() {
