@@ -98,8 +98,8 @@ function create() {
     frameRate: 20
   });
 
-  this.physics.world.setBounds(0, 0, 1600, 480);
-  this.cameras.main.setBounds(0, 0, 1600, 480);
+  this.physics.world.setBounds(0, 0, 2000, 600);
+  this.cameras.main.setBounds(0, 0, 2000, 600);
   this.cameras.main.startFollow(player);
 
 }
