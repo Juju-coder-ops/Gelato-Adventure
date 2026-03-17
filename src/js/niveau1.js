@@ -13,7 +13,6 @@ export default class niveau1 extends Phaser.Scene {
   }
 
 
-
   preload() {
     this.load.spritesheet("img_perso", "src/assets/dude.png", {
       frameWidth: 32,
