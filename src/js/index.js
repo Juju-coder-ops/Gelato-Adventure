@@ -59,13 +59,19 @@ function create() {
 
   console.log(tilesetAncien, tilesetSable, tilesetPlage);
 
+      const calque_jeu = carteDuNiveau.createLayer(
+    "Calque de Tuiles 1",
+    [tilesetAncien, tilesetSable, tilesetPlage],
+    0,
+    0
+  );
+
   const calque_plateformes = carteDuNiveau.createLayer(
     "calque_plateforme",
     [tilesetAncien, tilesetSable, tilesetPlage],
     0,
     0
   );
-
   console.log(calque_plateformes);
 
   calque_plateformes.setCollisionByProperty({ estSolide: true });
@@ -98,8 +104,8 @@ function create() {
     frameRate: 20
   });
 
-  this.physics.world.setBounds(0, 0, 2000, 600);
-  this.cameras.main.setBounds(0, 0, 2000, 600);
+  this.physics.world.setBounds(0, 0, 3000, 960);
+  this.cameras.main.setBounds(0, 0, 3000, 960);
   this.cameras.main.startFollow(player);
 
 }
