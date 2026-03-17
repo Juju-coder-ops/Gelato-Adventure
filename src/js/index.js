@@ -1,5 +1,6 @@
 var player;
 var clavier;
+var gameOver = false;
 
 var config = {
   type: Phaser.AUTO,
@@ -23,12 +24,12 @@ var config = {
 new Phaser.Game(config);
 
 function preload() {
-  console.log("preload lancé");
-
   this.load.spritesheet("img_perso", "src/assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48
   });
+
+  this.load.image("img_glace", "src/assets/glace.png");
 
   this.load.image("Phaser_tuile_plage", "src/assets/tuile_plage.png");
   this.load.image("Phaser_tuile_sable", "src/assets/tuile sable.png");
@@ -38,26 +39,11 @@ function preload() {
 }
 
 function create() {
-  console.log("create lancé");
+  const carteDuNiveau = this.add.tilemap("map_jeu_glace");
 
-  const carteDuNiveau = this.add.tilemap("map_jeu_glace" );
-
-  const tilesetAncien = carteDuNiveau.addTilesetImage(
-    "tuile_ancien",
-    "Phaser_tuile_ancien"
-  );
-
-  const tilesetSable = carteDuNiveau.addTilesetImage(
-    "tuile sable",
-    "Phaser_tuile_sable"
-  );
-
-  const tilesetPlage = carteDuNiveau.addTilesetImage(
-    "tuile_plage",
-    "Phaser_tuile_plage"
-  );
-
-  console.log(tilesetAncien, tilesetSable, tilesetPlage);
+  const tilesetAncien = carteDuNiveau.addTilesetImage("tuile_ancien", "Phaser_tuile_ancien");
+  const tilesetSable = carteDuNiveau.addTilesetImage("tuile sable", "Phaser_tuile_sable");
+  const tilesetPlage = carteDuNiveau.addTilesetImage("tuile_plage", "Phaser_tuile_plage");
 
       const calque_jeu = carteDuNiveau.createLayer(
     "Calque de Tuiles 1",
@@ -84,6 +70,7 @@ function create() {
 
   clavier = this.input.keyboard.createCursorKeys();
 
+  // animations
   this.anims.create({
     key: "anim_tourne_gauche",
     frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
@@ -108,12 +95,25 @@ function create() {
   this.cameras.main.setBounds(0, 0, 3000, 960);
   this.cameras.main.startFollow(player);
 
+  // groupe de glaces
+  this.glaces = this.physics.add.group();
+
+  this.physics.add.collider(this.glaces, calque_plateformes);
+  this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
+
+  // timer de spawn
+  this.timerGlace = this.time.addEvent({
+    delay: 1000,
+    callback: spawnGlace,
+    callbackScope: this,
+    loop: true
+  });
 }
 
 function update() {
-  if (!clavier || !player) {
-    return;
-  }
+  if (gameOver) return;
+
+  if (!clavier || !player) return;
 
   if (clavier.right.isDown) {
     player.setVelocityX(160);
@@ -129,4 +129,36 @@ function update() {
   if (clavier.up.isDown && player.body.blocked.down) {
     player.setVelocityY(-250);
   }
+}
+
+function spawnGlace() {
+  if (gameOver) return;
+
+  var x = Phaser.Math.Between(0, 800);
+  var glace = this.glaces.create(x, 0, "img_glace");
+
+  glace.setBounce(0.3);
+  glace.setVelocity(Phaser.Math.Between(-50, 50), 200);
+}
+
+function toucheGlace(player, glace) {
+  if (gameOver) return;
+
+  gameOver = true;
+
+  this.physics.pause();
+  this.timerGlace.remove();
+
+  player.setTint(0xff0000);
+
+  this.tweens.add({
+    targets: player,
+    alpha: 0,
+    duration: 500
+  });
+
+  this.add.text(player.x - 100, player.y - 50, "GAME OVER", {
+    fontSize: "48px",
+    fill: "#ff0000"
+  }).setDepth(100);
 }
