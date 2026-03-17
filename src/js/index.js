@@ -1,3 +1,4 @@
+
 var player;
 var clavier;
 var gameOver = false;
