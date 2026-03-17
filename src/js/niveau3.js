@@ -10,6 +10,9 @@ export default class niveau3 extends Phaser.Scene {
 
 var player;
 var clavier;
+var surVerglas = false;
+var calqueVerglas1;
+var calqueVerglas2;
 
 var config = {
   type: Phaser.AUTO,
@@ -73,31 +76,33 @@ function create() {
   console.log(tilesetFond, tilesetBloc, tilesetObjet);
 
   // TES CALQUES
-  const calque1 = carteDuNiveau.createLayer(
+  calqueVerglas1 = carteDuNiveau.createLayer(
     "Calque de Tuiles 1",
     [tilesetFond, tilesetBloc, tilesetObjet],
     0,
     0
   );
 
-  const calque2 = carteDuNiveau.createLayer(
+  calqueVerglas2 = carteDuNiveau.createLayer(
     "Calque de Tuiles 2",
     [tilesetFond, tilesetBloc, tilesetObjet],
     0,
     0
   );
 
-  console.log(calque1, calque2);
+console.log(calqueVerglas1, calqueVerglas2);
 
-  calque1.setCollisionByProperty({ estSolide: true });
-  calque2.setCollisionByProperty({ estSolide: true });
+calqueVerglas1.setCollisionByProperty({ estSolide: true });
+calqueVerglas2.setCollisionByProperty({ estSolide: true });
 
   player = this.physics.add.sprite(100, 100, "img_perso");
   player.setCollideWorldBounds(true);
   player.setBounce(0.2);
+  player.setDragX(1200);
+  player.setMaxVelocity(200, 500);
 
-  this.physics.add.collider(player, calque1);
-  this.physics.add.collider(player, calque2);
+  this.physics.add.collider(player, calqueVerglas1);
+  this.physics.add.collider(player, calqueVerglas2);
 
   clavier = this.input.keyboard.createCursorKeys();
 
@@ -131,15 +136,41 @@ function update() {
     return;
   }
 
+  const xPieds = player.x;
+  const yPieds = player.body.bottom + 2;
+
+  const tuile1 = calqueVerglas1.getTileAtWorldXY(xPieds, yPieds, true);
+  const tuile2 = calqueVerglas2.getTileAtWorldXY(xPieds, yPieds, true);
+
+  surVerglas = false;
+
+  if (tuile1 && tuile1.properties && tuile1.properties.estVerglas) {
+    surVerglas = true;
+  }
+
+  if (tuile2 && tuile2.properties && tuile2.properties.estVerglas) {
+    surVerglas = true;
+  }
+
+  if (surVerglas) {
+    player.setDragX(120);
+  } else {
+    player.setDragX(1200);
+  }
+
   if (clavier.right.isDown) {
-    player.setVelocityX(160);
+    player.setAccelerationX(600);
     player.anims.play("anim_tourne_droite", true);
   } else if (clavier.left.isDown) {
-    player.setVelocityX(-160);
+    player.setAccelerationX(-600);
     player.anims.play("anim_tourne_gauche", true);
   } else {
-    player.setVelocityX(0);
-    player.anims.play("anim_face");
+    player.setAccelerationX(0);
+
+    if (Math.abs(player.body.velocity.x) < 5) {
+      player.setVelocityX(0);
+      player.anims.play("anim_face", true);
+    }
   }
 
   if (clavier.up.isDown && player.body.blocked.down) {

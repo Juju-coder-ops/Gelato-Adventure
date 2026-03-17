@@ -1,4 +1,12 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"json",
+         "target":"montagne.tiled-project.tmj"
+        }
+    },
  "height":30,
  "infinite":false,
  "layers":[
@@ -10709,6 +10717,11 @@
                          "name":"estSolide",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -10716,6 +10729,11 @@
                  "properties":[
                         {
                          "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
                          "type":"bool",
                          "value":true
                         }]
@@ -10727,6 +10745,11 @@
                          "name":"estSolide",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -10734,6 +10757,11 @@
                  "properties":[
                         {
                          "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
                          "type":"bool",
                          "value":true
                         }]
@@ -11142,6 +11170,11 @@
                          "name":"estSolide",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -11149,6 +11182,11 @@
                  "properties":[
                         {
                          "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
                          "type":"bool",
                          "value":true
                         }]
@@ -11160,6 +11198,11 @@
                          "name":"estSolide",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -11167,6 +11210,11 @@
                  "properties":[
                         {
                          "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
                          "type":"bool",
                          "value":true
                         }]
@@ -11574,6 +11622,11 @@
                          "name":"estSolide",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -11581,6 +11634,11 @@
                  "properties":[
                         {
                          "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
                          "type":"bool",
                          "value":true
                         }]
@@ -11592,6 +11650,11 @@
                          "name":"estSolide",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
+                         "type":"bool",
+                         "value":true
                         }]
                 }, 
                 {
@@ -11599,6 +11662,11 @@
                  "properties":[
                         {
                          "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"estVerglas",
                          "type":"bool",
                          "value":true
                         }]
