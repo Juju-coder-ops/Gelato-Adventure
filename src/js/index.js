@@ -135,7 +135,7 @@ function update() {
     player.setVelocityY(-250);
   }
 }
-*/
+
 
 var player;
 var clavier;
