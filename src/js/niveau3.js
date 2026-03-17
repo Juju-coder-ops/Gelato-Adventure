@@ -135,15 +135,11 @@ function update() {
   if (!clavier || !player) {
     return;
   }
-
   const xPieds = player.x;
   const yPieds = player.body.bottom + 2;
 
   const tuile1 = calqueVerglas1.getTileAtWorldXY(xPieds, yPieds, true);
   const tuile2 = calqueVerglas2.getTileAtWorldXY(xPieds, yPieds, true);
-
-  surVerglas = false;
-
   if (tuile1 && tuile1.properties && tuile1.properties.estVerglas) {
     surVerglas = true;
   }
@@ -151,13 +147,12 @@ function update() {
   if (tuile2 && tuile2.properties && tuile2.properties.estVerglas) {
     surVerglas = true;
   }
-
   if (surVerglas) {
     player.setDragX(120);
   } else {
     player.setDragX(1200);
   }
-
+  surVerglas = false;
   if (clavier.right.isDown) {
     player.setAccelerationX(600);
     player.anims.play("anim_tourne_droite", true);
