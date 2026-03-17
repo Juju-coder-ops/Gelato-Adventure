@@ -31,8 +31,7 @@ function preload() {
 
   this.load.image("img_glace", "src/assets/glace.png");
 
-  this.load.image("Phaser_tuile_plage", "src/assets/tuile_plage.png");
-  this.load.image("Phaser_tuile_sable", "src/assets/tuile sable.png");
+  this.load.image("Phaser_tuile_plage", "src/assets/tuile plage.png");
   this.load.image("Phaser_tuile_ancien", "src/assets/tuile_ancien.png");
 
   this.load.tilemapTiledJSON("map_jeu_glace", "src/assets/map_jeu_glace.tmj");
@@ -42,33 +41,39 @@ function create() {
   const carteDuNiveau = this.add.tilemap("map_jeu_glace");
 
   const tilesetAncien = carteDuNiveau.addTilesetImage("tuile_ancien", "Phaser_tuile_ancien");
-  const tilesetSable = carteDuNiveau.addTilesetImage("tuile sable", "Phaser_tuile_sable");
-  const tilesetPlage = carteDuNiveau.addTilesetImage("tuile_plage", "Phaser_tuile_plage");
+  const tilesetPlage = carteDuNiveau.addTilesetImage("Tuile plage", "Phaser_tuile_plage");
 
-  const calque_jeu = carteDuNiveau.createLayer(
-    "Calque de Tuiles 1",
-    [tilesetAncien, tilesetSable, tilesetPlage],
+      const calque_jeu = carteDuNiveau.createLayer(
+    "fond",
+    [tilesetAncien, tilesetPlage],
     0,
     0
   );
 
   const calque_plateformes = carteDuNiveau.createLayer(
-    "calque_plateforme",
-    [tilesetAncien, tilesetSable, tilesetPlage],
+    "Plateforme",
+    [tilesetAncien,  tilesetPlage],
     0,
     0
   );
-  console.log(calque_plateformes);
+
+  const calque_sol = carteDuNiveau.createLayer(
+    "sol",
+    [tilesetAncien,  tilesetPlage],
+    0,
+    0
+  );
 
   calque_plateformes.setCollisionByProperty({ estSolide: true });
+  calque_sol.setCollisionByProperty({ estSolide: true });
 
   player = this.physics.add.sprite(100, 100, "img_perso");
   player.setCollideWorldBounds(true);
   player.setBounce(0.2);
 
   this.physics.add.collider(player, calque_plateformes);
-  this.physics.add.collider(player, calque_jeu);
-
+  this.physics.add.collider(player, calque_sol);
+  
 
   clavier = this.input.keyboard.createCursorKeys();
 
@@ -102,7 +107,7 @@ function create() {
 
   this.physics.add.collider(this.glaces, calque_plateformes);
   this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
-
+  
 
 
   // timer de spawn
