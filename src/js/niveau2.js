@@ -1,11 +1,3 @@
-export default class niveau2 extends Phaser.Scene {
-  // constructeur de la classe
-  constructor() {
-    super({
-      key: "niveau2" //  ici on précise le nom de la classe en tant qu'identifiant
-    });
-  }
-}
 var player;
 var clavier;
 var gameOver = false;
@@ -13,28 +5,15 @@ var score = 0;
 var texteScore;
 var sautCount = 0;
 
-var config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  backgroundColor: "#87ceeb",
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 300 },
-      debug: false
-    }
-  },
-  scene: {
-    preload: preload,
-    create: create,
-    update: update
+export default class niveau2 extends Phaser.Scene {
+  // constructeur de la classe
+  constructor() {
+    super({
+      key: "niveau2" //  ici on précise le nom de la classe en tant qu'identifiant
+    });
   }
-};
 
-new Phaser.Game(config);
-
-function preload() {
+  preload() {
   this.load.spritesheet("img_perso", "src/assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48
@@ -47,7 +26,7 @@ function preload() {
   this.load.tilemapTiledJSON("map_foret", "src/assets/forest.tmj");
 }
 
-function create() {
+create() {
   const carteDuNiveau = this.add.tilemap("map_foret");
   const tilesetForet = carteDuNiveau.addTilesetImage("foret", "tileset_foret");
 
@@ -136,7 +115,7 @@ function create() {
   this.physics.add.overlap(player, this.chocolats, ramasserChocolat, null, this);
 }
 
-function update() {
+ update() {
   if (gameOver) return;
   if (!clavier || !player) return;
 
@@ -160,6 +139,9 @@ function update() {
     sautCount++;
   }
 }
+
+}
+
 
 function spawnGlace() {
   if (gameOver) return;

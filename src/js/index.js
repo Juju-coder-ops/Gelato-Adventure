@@ -1,5 +1,6 @@
 import accueil from "./accueil.js";
 import niveau1 from "./niveau1.js";
+import niveau2 from "./niveau2.js";
 
 var config = {
   type: Phaser.AUTO,
@@ -17,7 +18,7 @@ var config = {
       debug: true
     }
   },
-  scene: [accueil, niveau1]
+  scene: [accueil, niveau1, niveau2]
 };
 
 var g = new Phaser.Game(config);
