@@ -97,6 +97,7 @@ export default class niveau1 extends Phaser.Scene {
 
     // groupe de glaces
     this.glaces = this.physics.add.group();
+    this.maxGlacesEcran = 4;
 
     this.physics.add.collider(this.glaces, calque_plateformes);
     this.physics.add.collider(this.glaces, calque_sol);
@@ -114,10 +115,10 @@ export default class niveau1 extends Phaser.Scene {
 
 
     this.add.text(2700, 620, "Appuie sur ESPACE", {
-    fontSize: "18px",
-    fill: "#ffffff",
-    backgroundColor: "#000000"
-  });
+      fontSize: "18px",
+      fill: "#ffffff",
+      backgroundColor: "#000000"
+    });
   }
 
   update() {
@@ -144,10 +145,15 @@ export default class niveau1 extends Phaser.Scene {
       sautCount++;
     }
     if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
-    if (this.physics.overlap(player, this.porte_sortie)) {
-    this.scene.start("niveau2");
-  }
-}
+      if (this.physics.overlap(player, this.porte_sortie)) {
+        this.scene.start("niveau2");
+      }
+    }
+    this.glaces.children.each(function (glace) {
+      if (glace.y > 1200) {
+        glace.destroy();
+      }
+    });
   }
 }
 function spawnGlace() {
@@ -156,19 +162,37 @@ function spawnGlace() {
   var cameraX = this.cameras.main.scrollX;
   var cameraY = this.cameras.main.scrollY;
   var largeurCamera = this.cameras.main.width;
+  var hauteurCamera = this.cameras.main.height;
 
-  // spawn dans la zone visible actuelle
+  // Compter les glaces déjà présentes dans l'écran actuel
+  var nbGlacesVisibles = 0;
+
+  this.glaces.children.each(function (glace) {
+    if (
+      glace.active &&
+      glace.x >= cameraX &&
+      glace.x <= cameraX + largeurCamera &&
+      glace.y >= cameraY - 100 &&
+      glace.y <= cameraY + hauteurCamera + 100
+    ) {
+      nbGlacesVisibles++;
+    }
+  });
+
+  // S'il y en a déjà trop, on ne fait pas tomber de nouvelle glace
+  if (nbGlacesVisibles >= this.maxGlacesEcran) {
+    return;
+  }
+
+  // Sinon on en crée une
   var x = Phaser.Math.Between(cameraX, cameraX + largeurCamera);
   var y = cameraY - 50;
 
   var glace = this.glaces.create(x, y, "img_glace");
 
   glace.setScale(0.7);
-
-  // rebond
-  glace.setBounce(0.8);
-
-  // petit mouvement en tombant
+  glace.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+  glace.setBounceX(0.2);
   glace.setVelocity(
     Phaser.Math.Between(-50, 50),
     Phaser.Math.Between(120, 180)
