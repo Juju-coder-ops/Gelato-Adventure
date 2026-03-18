@@ -2,7 +2,7 @@ export default class fin extends Phaser.Scene {
 
     constructor() {
         super({
-            key: "fin"
+            key: "niveau3"
         });
     }
 
