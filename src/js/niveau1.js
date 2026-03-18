@@ -99,9 +99,8 @@ export default class niveau1 extends Phaser.Scene {
     this.glaces = this.physics.add.group();
 
     this.physics.add.collider(this.glaces, calque_plateformes);
+    this.physics.add.collider(this.glaces, calque_sol);
     this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
-
-
 
     // timer de spawn
     this.timerGlace = this.time.addEvent({
@@ -154,13 +153,26 @@ export default class niveau1 extends Phaser.Scene {
 function spawnGlace() {
   if (gameOver) return;
 
-  var x = Phaser.Math.Between(0, 800);
-  var glace = this.glaces.create(x, 0, "img_glace");
+  var cameraX = this.cameras.main.scrollX;
+  var cameraY = this.cameras.main.scrollY;
+  var largeurCamera = this.cameras.main.width;
 
-  glace.setBounce(0.3);
-  glace.setVelocity(Phaser.Math.Between(-50, 50), 150);
+  // spawn dans la zone visible actuelle
+  var x = Phaser.Math.Between(cameraX, cameraX + largeurCamera);
+  var y = cameraY - 50;
+
+  var glace = this.glaces.create(x, y, "img_glace");
+
   glace.setScale(0.7);
 
+  // rebond
+  glace.setBounce(0.8);
+
+  // petit mouvement en tombant
+  glace.setVelocity(
+    Phaser.Math.Between(-50, 50),
+    Phaser.Math.Between(120, 180)
+  );
 }
 
 function toucheGlace(player, glace) {
