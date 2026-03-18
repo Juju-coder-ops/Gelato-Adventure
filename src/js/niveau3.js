@@ -1,36 +1,13 @@
-var player;
-var clavier;
-var gameOver = false;
-var surVerglas = false;
-var calqueVerglas1;
-var calqueVerglas2;
-var sautCount = 0;
-var score = 0;
-var texteScore;
+export default class fin extends Phaser.Scene {
 
-export default class niveau3 extends Phaser.Scene {
-  constructor() {
-    super({
-      key: "niveau3"
-    });
-  }
+    constructor() {
+        super({
+            key: "fin"
+        });
+    }
 
-  preload() {
-    this.load.spritesheet("img_perso", "src/assets/dude.png", {
-      frameWidth: 32,
-      frameHeight: 48
-    });
-
-    this.load.image("img_glace", "src/assets/glace.png");
-    this.load.image("img_porte_sortie", "src/assets/door_exit.png");
-
-    this.load.image("fondneige", "src/assets/fondneige.png");
-    this.load.image("blocneige", "src/assets/blocneige.png");
-    this.load.image("objetneige", "src/assets/objetneige.png");
-    this.load.image("img_choco", "src/assets/collect_choco.png")
-
-    this.load.tilemapTiledJSON("map_montagne", "src/assets/montagne.tiled-project.tmj");
-  }
+    preload() {
+    }
 
   create() {
     gameOver = false;
@@ -77,7 +54,7 @@ export default class niveau3 extends Phaser.Scene {
 
     // Réglages de base du déplacement
     player.setMaxVelocity(200, 500);
-    player.setDragX(5);
+    player.setDragX(1200);
 
     this.physics.add.collider(player, calqueVerglas1);
     this.physics.add.collider(player, calqueVerglas2);
@@ -175,7 +152,27 @@ export default class niveau3 extends Phaser.Scene {
     if (gameOver) return;
     if (!clavier || !player) return;
 
-    player.setDragX(2);
+    const xPieds = player.x;
+    const yPieds = player.body.bottom + 2;
+
+    const tuile1 = calqueVerglas1.getTileAtWorldXY(xPieds, yPieds, true);
+    const tuile2 = calqueVerglas2.getTileAtWorldXY(xPieds, yPieds, true);
+
+    surVerglas = false;
+
+    if (tuile1 && tuile1.properties && tuile1.properties.estVerglas) {
+      surVerglas = true;
+    }
+
+    if (tuile2 && tuile2.properties && tuile2.properties.estVerglas) {
+      surVerglas = true;
+    }
+
+    if (surVerglas) {
+      player.setDragX(10);
+    } else {
+      player.setDragX(1200);
+    }
 
     if (clavier.right.isDown) {
       player.setAccelerationX(600);
