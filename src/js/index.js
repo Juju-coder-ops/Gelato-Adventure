@@ -17,7 +17,7 @@ var config = {
     default: "arcade",
     arcade: {
       gravity: { y: 300 },
-      debug: true
+      debug: false
     }
   },
   scene: [accueil, niveau1, niveau2, niveau3, fin]
