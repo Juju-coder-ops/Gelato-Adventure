@@ -14,162 +14,196 @@ export default class niveau2 extends Phaser.Scene {
   }
 
   preload() {
-  this.load.spritesheet("img_perso", "src/assets/dude.png", {
-    frameWidth: 32,
-    frameHeight: 48
-  });
+    this.load.spritesheet("img_perso", "src/assets/dude.png", {
+      frameWidth: 32,
+      frameHeight: 48
+    });
 
-  this.load.image("img_glace", "src/assets/glace.png");
-  this.load.image("img_choco", "src/assets/collect_choco.png");
-  this.load.image("img_porte_sortie", "src/assets/door_exit.png");
+    this.load.image("img_glace", "src/assets/glace.png");
+    this.load.image("img_choco", "src/assets/collect_choco.png");
+    this.load.image("img_porte_sortie", "src/assets/door_exit.png");
 
-  this.load.image("tileset_foret", "src/assets/foret.jpg");
-  this.load.tilemapTiledJSON("map_foret", "src/assets/forest.tmj");
-}
+    this.load.image("tileset_foret", "src/assets/foret.jpg");
+    this.load.tilemapTiledJSON("map_foret", "src/assets/forest.tmj");
+  }
 
-create() {
-  const carteDuNiveau = this.add.tilemap("map_foret");
-  const tilesetForet = carteDuNiveau.addTilesetImage("foret", "tileset_foret");
+  create() {
+    const carteDuNiveau = this.add.tilemap("map_foret");
+    const tilesetForet = carteDuNiveau.addTilesetImage("foret", "tileset_foret");
 
-  const calque_foret = carteDuNiveau.createLayer(
-    "Calque de Tuiles 1",
-    [tilesetForet],
-    0,
-    0
-  );
+    const calque_foret = carteDuNiveau.createLayer(
+      "Calque de Tuiles 1",
+      [tilesetForet],
+      0,
+      0
+    );
 
-  calque_foret.setCollisionByProperty({ estSolide: true });
+    calque_foret.setCollisionByProperty({ estSolide: true });
 
-  player = this.physics.add.sprite(100, 100, "img_perso");
-  player.setCollideWorldBounds(true);
-  player.setBounce(0.2);
+    player = this.physics.add.sprite(100, 100, "img_perso");
+    player.setCollideWorldBounds(true);
+    player.setBounce(0.2);
 
-  this.physics.add.collider(player, calque_foret);
+    this.physics.add.collider(player, calque_foret);
 
-  clavier = this.input.keyboard.createCursorKeys();
+    clavier = this.input.keyboard.createCursorKeys();
 
-  this.anims.create({
-    key: "anim_tourne_gauche",
-    frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
-    frameRate: 10,
-    repeat: -1
-  });
+    this.anims.create({
+      key: "anim_tourne_gauche",
+      frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1
+    });
 
-  this.anims.create({
-    key: "anim_tourne_droite",
-    frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
-    frameRate: 10,
-    repeat: -1
-  });
+    this.anims.create({
+      key: "anim_tourne_droite",
+      frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
+      frameRate: 10,
+      repeat: -1
+    });
 
-  this.anims.create({
-    key: "anim_face",
-    frames: [{ key: "img_perso", frame: 4 }],
-    frameRate: 20
-  });
+    this.anims.create({
+      key: "anim_face",
+      frames: [{ key: "img_perso", frame: 4 }],
+      frameRate: 20
+    });
 
-  this.physics.world.setBounds(0, 0, carteDuNiveau.widthInPixels, carteDuNiveau.heightInPixels);
-  this.cameras.main.setBounds(0, 0, carteDuNiveau.widthInPixels, carteDuNiveau.heightInPixels);
-  this.cameras.main.startFollow(player);
+    this.physics.world.setBounds(0, 0, carteDuNiveau.widthInPixels, carteDuNiveau.heightInPixels);
+    this.cameras.main.setBounds(0, 0, carteDuNiveau.widthInPixels, carteDuNiveau.heightInPixels);
+    this.cameras.main.startFollow(player);
 
-  texteScore = this.add.text(16, 16, "Score : 0", {
-    fontSize: "24px",
-    fill: "#ffffff",
-    backgroundColor: "#000000"
-  });
-  texteScore.setScrollFactor(0);
-  texteScore.setDepth(100);
+    texteScore = this.add.text(16, 16, "Score : 0", {
+      fontSize: "24px",
+      fill: "#ffffff",
+      backgroundColor: "#000000"
+    });
+    texteScore.setScrollFactor(0);
+    texteScore.setDepth(100);
 
-  this.glaces = this.physics.add.group();
-  this.physics.add.collider(this.glaces, calque_foret);
-  this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
+    this.glaces = this.physics.add.group();
+    this.maxGlacesEcran = 4;
+    this.physics.add.collider(this.glaces, calque_foret);
+    this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
 
-  this.timerGlace = this.time.addEvent({
-    delay: 2000,
-    callback: spawnGlace,
-    callbackScope: this,
-    loop: true
-  });
+    this.timerGlace = this.time.addEvent({
+      delay: 2000,
+      callback: spawnGlace,
+      callbackScope: this,
+      loop: true
+    });
 
-  this.chocolats = this.physics.add.group();
+    this.chocolats = this.physics.add.group();
 
-  var positionsChoco = [
-    { x: 200, y: 0 },
-    { x: 350, y: 0 },
-    { x: 500, y: 0 },
-    { x: 650, y: 0 },
-    { x: 850, y: 0 },
-    { x: 1000, y: 0 },
-    { x: 1200, y: 0 },
-    { x: 1400, y: 0 },
-    { x: 1600, y: 0 },
-    { x: 1800, y: 0 }
-  ];
+    var positionsChoco = [
+      { x: 200, y: 0 },
+      { x: 350, y: 0 },
+      { x: 500, y: 0 },
+      { x: 650, y: 0 },
+      { x: 850, y: 0 },
+      { x: 1000, y: 0 },
+      { x: 1200, y: 0 },
+      { x: 1400, y: 0 },
+      { x: 1600, y: 0 },
+      { x: 1800, y: 0 }
+    ];
 
-  positionsChoco.forEach(function (pos) {
-    var choco = this.chocolats.create(pos.x, pos.y, "img_choco");
-    choco.setBounce(0.1);
-    choco.setCollideWorldBounds(true);
-  }, this);
+    positionsChoco.forEach(function (pos) {
+      var choco = this.chocolats.create(pos.x, pos.y, "img_choco");
+      choco.setBounce(0.1);
+      choco.setCollideWorldBounds(true);
+    }, this);
 
-  this.physics.add.collider(this.chocolats, calque_foret);
-  this.physics.add.overlap(player, this.chocolats, ramasserChocolat, null, this);
-     
-  this.porte_sortie = this.physics.add.staticSprite(2850, 700, "img_porte_sortie");
+    this.physics.add.collider(this.chocolats, calque_foret);
+    this.physics.add.overlap(player, this.chocolats, ramasserChocolat, null, this);
+
+    this.porte_sortie = this.physics.add.staticSprite(2850, 700, "img_porte_sortie");
 
 
     this.add.text(2700, 620, "Appuie sur ESPACE", {
-    fontSize: "18px",
-    fill: "#ffffff",
-    backgroundColor: "#000000"
-  });
+      fontSize: "18px",
+      fill: "#ffffff",
+      backgroundColor: "#000000"
+    });
 
-}
-
- update() {
-  if (gameOver) return;
-  if (!clavier || !player) return;
-
-  if (player.body.blocked.down) {
-    sautCount = 0;
   }
 
-  if (clavier.right.isDown) {
-    player.setVelocityX(160);
-    player.anims.play("anim_tourne_droite", true);
-  } else if (clavier.left.isDown) {
-    player.setVelocityX(-160);
-    player.anims.play("anim_tourne_gauche", true);
-  } else {
-    player.setVelocityX(0);
-    player.anims.play("anim_face");
-  }
+  update() {
+    if (gameOver) return;
+    if (!clavier || !player) return;
 
-  if (Phaser.Input.Keyboard.JustDown(clavier.up) && sautCount < 2) {
-    player.setVelocityY(-320);
-    sautCount++;
-  }
-  if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
-  if (this.physics.overlap(player, this.porte_sortie)) {
-    this.scene.start("niveau3");
+    if (player.body.blocked.down) {
+      sautCount = 0;
+    }
+
+    if (clavier.right.isDown) {
+      player.setVelocityX(160);
+      player.anims.play("anim_tourne_droite", true);
+    } else if (clavier.left.isDown) {
+      player.setVelocityX(-160);
+      player.anims.play("anim_tourne_gauche", true);
+    } else {
+      player.setVelocityX(0);
+      player.anims.play("anim_face");
+    }
+
+    if (Phaser.Input.Keyboard.JustDown(clavier.up) && sautCount < 2) {
+      player.setVelocityY(-320);
+      sautCount++;
+    }
+    if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+      if (this.physics.overlap(player, this.porte_sortie)) {
+        this.scene.start("niveau3");
+      }
+    }
+    this.glaces.children.each(function (glace) {
+      if (glace.y > 1200) {
+        glace.destroy();
+      }
+    });
   }
 }
-}
-
-}
-
 
 function spawnGlace() {
   if (gameOver) return;
 
-  var x = Phaser.Math.Between(0, 800);
-  var glace = this.glaces.create(x, 0, "img_glace");
+  var cameraX = this.cameras.main.scrollX;
+  var cameraY = this.cameras.main.scrollY;
+  var largeurCamera = this.cameras.main.width;
+  var hauteurCamera = this.cameras.main.height;
+
+  // compter les glaces déjà visibles
+  var nbGlacesVisibles = 0;
+
+  this.glaces.children.each(function (glace) {
+    if (
+      glace.active &&
+      glace.x >= cameraX &&
+      glace.x <= cameraX + largeurCamera &&
+      glace.y >= cameraY - 100 &&
+      glace.y <= cameraY + hauteurCamera + 100
+    ) {
+      nbGlacesVisibles++;
+    }
+  });
+
+  // si il y en a déjà trop, on arrête
+  if (nbGlacesVisibles >= this.maxGlacesEcran) {
+    return;
+  }
+
+  // sinon on crée une nouvelle glace dans la zone visible
+  var x = Phaser.Math.Between(cameraX, cameraX + largeurCamera);
+  var y = cameraY - 50;
+
+  var glace = this.glaces.create(x, y, "img_glace");
 
   glace.setScale(0.7);
-  glace.refreshBody();
-
-  glace.setBounce(0.2);
-  glace.setVelocity(Phaser.Math.Between(-30, 30), 150);
+  glace.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+  glace.setBounceX(0.2);
+  glace.setVelocity(
+    Phaser.Math.Between(-50, 50),
+    Phaser.Math.Between(120, 180)
+  );
 }
 
 function ramasserChocolat(player, chocolat) {
