@@ -6,10 +6,9 @@ var texteVies;
 var invulnerable = false;
 
 export default class niveau1 extends Phaser.Scene {
-  // constructeur de la classe
   constructor() {
     super({
-      key: "niveau1" //  ici on précise le nom de la classe en tant qu'identifiant
+      key: "niveau1"
     });
   }
 
@@ -20,7 +19,6 @@ export default class niveau1 extends Phaser.Scene {
     });
 
     this.load.image("img_glace", "src/assets/glace.png");
-
     this.load.image("Phaser_tuile_plage", "src/assets/tuile plage.png");
     this.load.image("Phaser_tuile_ancien", "src/assets/tuile_ancien.png");
     this.load.image("img_porte_sortie", "src/assets/door_exit.png");
@@ -33,7 +31,7 @@ export default class niveau1 extends Phaser.Scene {
     sautCount = 0;
     invulnerable = false;
 
-    // initialise les vies si elles n'existent pas encore
+    // Initialisation des vies seulement au début du jeu
     if (this.registry.get("vies") === undefined) {
       this.registry.set("vies", 3);
     }
@@ -43,12 +41,7 @@ export default class niveau1 extends Phaser.Scene {
     const tilesetAncien = carteDuNiveau.addTilesetImage("tuile_ancien", "Phaser_tuile_ancien");
     const tilesetPlage = carteDuNiveau.addTilesetImage("Tuile plage", "Phaser_tuile_plage");
 
-    const calque_jeu = carteDuNiveau.createLayer(
-      "fond",
-      [tilesetAncien, tilesetPlage],
-      0,
-      0
-    );
+    carteDuNiveau.createLayer("fond", [tilesetAncien, tilesetPlage], 0, 0);
 
     const calque_plateformes = carteDuNiveau.createLayer(
       "Plateforme",
@@ -77,7 +70,6 @@ export default class niveau1 extends Phaser.Scene {
 
     clavier = this.input.keyboard.createCursorKeys();
 
-    // animations
     if (!this.anims.exists("anim_tourne_gauche")) {
       this.anims.create({
         key: "anim_tourne_gauche",
@@ -108,16 +100,13 @@ export default class niveau1 extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, 3000, 960);
     this.cameras.main.startFollow(player);
 
-    // affichage des vies
-    texteVies = this.add.text(16, 16, "Vies : " + this.registry.get("vies"), {
-      fontSize: "24px",
-      fill: "#ffffff",
-      backgroundColor: "#000000"
+    // Affichage des coeurs
+    texteVies = this.add.text(16, 16, "❤️".repeat(this.registry.get("vies")), {
+      fontSize: "28px"
     });
     texteVies.setScrollFactor(0);
     texteVies.setDepth(100);
 
-    // groupe de glaces
     this.glaces = this.physics.add.group();
     this.maxGlacesEcran = 4;
 
@@ -125,7 +114,6 @@ export default class niveau1 extends Phaser.Scene {
     this.physics.add.collider(this.glaces, calque_sol);
     this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
 
-    // timer de spawn
     this.timerGlace = this.time.addEvent({
       delay: 2000,
       callback: spawnGlace,
@@ -188,7 +176,6 @@ function spawnGlace() {
   var largeurCamera = this.cameras.main.width;
   var hauteurCamera = this.cameras.main.height;
 
-  // Compter les glaces déjà présentes dans l'écran actuel
   var nbGlacesVisibles = 0;
 
   this.glaces.children.each(function (glace) {
@@ -203,12 +190,10 @@ function spawnGlace() {
     }
   });
 
-  // S'il y en a déjà trop, on ne fait pas tomber de nouvelle glace
   if (nbGlacesVisibles >= this.maxGlacesEcran) {
     return;
   }
 
-  // Sinon on en crée une
   var x = Phaser.Math.Between(cameraX, cameraX + largeurCamera);
   var y = cameraY - 50;
 
@@ -227,36 +212,22 @@ function toucheGlace(player, glace) {
   if (gameOver || invulnerable) return;
 
   invulnerable = true;
-
-  // on détruit la glace touchée
   glace.destroy();
 
   let vies = this.registry.get("vies");
   vies -= 1;
   this.registry.set("vies", vies);
 
-  texteVies.setText("Vies : " + vies);
+  texteVies.setText("❤️".repeat(vies));
 
   player.setTint(0xff0000);
 
-  const textePerteVie = this.add.text(player.x - 40, player.y - 50, "-1 vie", {
-    fontSize: "24px",
-    fill: "#ff0000",
-    backgroundColor: "#000000"
-  }).setDepth(100);
-
-  this.time.delayedCall(600, () => {
-    if (textePerteVie) {
-      textePerteVie.destroy();
-    }
-  });
-
-  // si le joueur n'a plus de vies
   if (vies <= 0) {
     gameOver = true;
     this.physics.pause();
+    this.timerGlace.remove();
 
-    this.add.text(player.x - 100, player.y - 100, "GAME OVER", {
+    this.add.text(player.x - 100, player.y - 80, "GAME OVER", {
       fontSize: "48px",
       fill: "#ff0000",
       backgroundColor: "#000000"
@@ -270,7 +241,6 @@ function toucheGlace(player, glace) {
     return;
   }
 
-  // clignotement + invincibilité temporaire
   this.tweens.add({
     targets: player,
     alpha: 0.3,

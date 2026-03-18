@@ -5,6 +5,8 @@ var surVerglas = false;
 var calqueVerglas1;
 var calqueVerglas2;
 var sautCount = 0;
+var score = 0;
+var texteScore;
 
 export default class niveau3 extends Phaser.Scene {
   constructor() {
@@ -25,11 +27,16 @@ export default class niveau3 extends Phaser.Scene {
     this.load.image("fondneige", "src/assets/fondneige.png");
     this.load.image("blocneige", "src/assets/blocneige.png");
     this.load.image("objetneige", "src/assets/objetneige.png");
+    this.load.image("img_choco", "src/assets/collect_choco.png")
 
     this.load.tilemapTiledJSON("map_montagne", "src/assets/montagne.tiled-project.tmj");
   }
 
   create() {
+    gameOver = false;
+    sautCount = 0;
+    score = 0;
+
     const carteDuNiveau = this.add.tilemap("map_montagne");
 
     const tilesetFond = carteDuNiveau.addTilesetImage(
@@ -70,7 +77,7 @@ export default class niveau3 extends Phaser.Scene {
 
     // Réglages de base du déplacement
     player.setMaxVelocity(200, 500);
-    player.setDragX(1200);
+    player.setDragX(5);
 
     this.physics.add.collider(player, calqueVerglas1);
     this.physics.add.collider(player, calqueVerglas2);
@@ -101,6 +108,14 @@ export default class niveau3 extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, 3200, 960);
     this.cameras.main.startFollow(player);
 
+    texteScore = this.add.text(16, 16, "Score : " + score, {
+      fontSize: "24px",
+      fill: "#ffffff",
+      backgroundColor: "#000000"
+    });
+    texteScore.setScrollFactor(0);
+    texteScore.setDepth(100);
+
     // ===== GLACES : pareil que niveau 1 et 2 =====
     this.glaces = this.physics.add.group();
     this.maxGlacesEcran = 4;
@@ -116,11 +131,42 @@ export default class niveau3 extends Phaser.Scene {
       loop: true
     });
 
+    this.chocolats = this.physics.add.group();
+
+    var positionsChoco = [
+      { x: 200, y: 0 },
+      { x: 350, y: 0 },
+      { x: 500, y: 0 },
+      { x: 650, y: 0 },
+      { x: 850, y: 0 },
+      { x: 1000, y: 0 },
+      { x: 1200, y: 0 },
+      { x: 1400, y: 0 },
+      { x: 1600, y: 0 },
+      { x: 1800, y: 0 }
+    ];
+
+    positionsChoco.forEach(function (pos) {
+      var choco = this.chocolats.create(pos.x, pos.y, "img_choco");
+      choco.setBounce(0.1);
+      choco.setCollideWorldBounds(true);
+    }, this);
+
+    this.physics.add.collider(this.chocolats, calqueVerglas1);
+    this.physics.add.collider(this.chocolats, calqueVerglas2);
+    this.physics.add.overlap(player, this.chocolats, ramasserChocolat, null, this);
+
     this.porte_sortie = this.physics.add.staticSprite(3000, 700, "img_porte_sortie");
 
     this.add.text(2850, 620, "Appuie sur ESPACE", {
       fontSize: "18px",
       fill: "#ffffff",
+      backgroundColor: "#000000"
+    });
+
+    this.textePorte = this.add.text(2600, 580, "", {
+      fontSize: "18px",
+      fill: "#ff0000",
       backgroundColor: "#000000"
     });
   }
@@ -129,27 +175,7 @@ export default class niveau3 extends Phaser.Scene {
     if (gameOver) return;
     if (!clavier || !player) return;
 
-    const xPieds = player.x;
-    const yPieds = player.body.bottom + 2;
-
-    const tuile1 = calqueVerglas1.getTileAtWorldXY(xPieds, yPieds, true);
-    const tuile2 = calqueVerglas2.getTileAtWorldXY(xPieds, yPieds, true);
-
-    surVerglas = false;
-
-    if (tuile1 && tuile1.properties && tuile1.properties.estVerglas) {
-      surVerglas = true;
-    }
-
-    if (tuile2 && tuile2.properties && tuile2.properties.estVerglas) {
-      surVerglas = true;
-    }
-
-    if (surVerglas) {
-      player.setDragX(10);
-    } else {
-      player.setDragX(1200);
-    }
+    player.setDragX(2);
 
     if (clavier.right.isDown) {
       player.setAccelerationX(600);
@@ -175,9 +201,21 @@ export default class niveau3 extends Phaser.Scene {
       sautCount++;
     }
 
+    if (this.physics.overlap(player, this.porte_sortie)) {
+      if (this.chocolats.countActive(true) === 0) {
+        this.textePorte.setText("Appuie sur ESPACE pour finir");
+      } else {
+        this.textePorte.setText("Ramasse tous les chocolats");
+      }
+    } else {
+      this.textePorte.setText("");
+    }
+
     if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
       if (this.physics.overlap(player, this.porte_sortie)) {
-        this.scene.start("fin");
+        if (this.chocolats.countActive(true) === 0) {
+          this.scene.start("fin");
+        }
       }
     }
 
@@ -227,6 +265,12 @@ function spawnGlace() {
     Phaser.Math.Between(-50, 50),
     Phaser.Math.Between(120, 180)
   );
+}
+
+function ramasserChocolat(player, chocolat) {
+  chocolat.destroy();
+  score += 10;
+  texteScore.setText("Score : " + score);
 }
 
 function toucheGlace(player, glace) {
