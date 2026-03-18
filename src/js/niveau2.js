@@ -125,6 +125,12 @@ export default class niveau2 extends Phaser.Scene {
       backgroundColor: "#000000"
     });
 
+    this.textePorte = this.add.text(2600, 580, "", {
+  fontSize: "18px",
+  fill: "#ff0000",
+  backgroundColor: "#000000"
+});
+
   }
 
   update() {
@@ -151,15 +157,34 @@ export default class niveau2 extends Phaser.Scene {
       sautCount++;
     }
     if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
-      if (this.physics.overlap(player, this.porte_sortie)) {
-        this.scene.start("niveau3");
-      }
+    if (this.physics.overlap(player, this.porte_sortie)) {
+    if (this.chocolats.countActive(true) === 0) {
+      this.scene.start("niveau3");
     }
+  }
+}
     this.glaces.children.each(function (glace) {
       if (glace.y > 1200) {
         glace.destroy();
       }
     });
+    if (this.physics.overlap(player, this.porte_sortie)) {
+  if (this.chocolats.countActive(true) === 0) {
+    this.textePorte.setText("Appuie sur ESPACE pour passer");
+  } else {
+    this.textePorte.setText("Ramasse tous les chocolats");
+  }
+} else {
+  this.textePorte.setText("");
+}
+
+if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+  if (this.physics.overlap(player, this.porte_sortie)) {
+    if (this.chocolats.countActive(true) === 0) {
+      this.scene.start("niveau3");
+    }
+  }
+}
   }
 }
 
