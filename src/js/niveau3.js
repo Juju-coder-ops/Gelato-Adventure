@@ -6,36 +6,8 @@ export default class niveau3 extends Phaser.Scene {
       key: "niveau3" //  ici on précise le nom de la classe en tant qu'identifiant
     });
   }
-}
 
-var player;
-var clavier;
-var surVerglas = false;
-var calqueVerglas1;
-var calqueVerglas2;
-
-var config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  backgroundColor: "#87ceeb",
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 300 },
-      debug: true
-    }
-  },
-  scene: {
-    preload: preload,
-    create: create,
-    update: update
-  }
-};
-
-new Phaser.Game(config);
-
-function preload() {
+  preload() {
   console.log("preload lancé");
 
   this.load.spritesheet("img_perso", "src/assets/dude.png", {
@@ -51,8 +23,7 @@ function preload() {
   // TA MAP
   this.load.tilemapTiledJSON("map_montagne", "src/assets/montagne.tiled-project.tmj");
 }
-
-function create() {
+create() {
   console.log("create lancé");
 
   const carteDuNiveau = this.add.tilemap("map_montagne");
@@ -130,8 +101,7 @@ calqueVerglas2.setCollisionByProperty({ estSolide: true });
   this.cameras.main.setBounds(0, 0, 3200, 960);
   this.cameras.main.startFollow(player);
 }
-
-function update() {
+update() {
   if (!clavier || !player) {
     return;
   }
@@ -177,3 +147,6 @@ function update() {
     player.setVelocityY(-250);
   }
 }
+}
+
+
