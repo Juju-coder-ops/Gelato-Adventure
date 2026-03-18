@@ -1,7 +1,7 @@
 import accueil from "./accueil.js";
 import niveau1 from "./niveau1.js";
 import niveau2 from "./niveau2.js";
-//import niveau3 from "./niveau2.js";
+//import niveau3 from "./niveau3.js";
 
 var config = {
   type: Phaser.AUTO,
