@@ -1,18 +1,50 @@
+var player;
+var clavier;
+var gameOver = false;
+var score = 0;
+var texteScore;
+var texteVies;
+var sautCount = 0;
+var invulnerable = false;
+
+var calqueVerglas1;
+var calqueVerglas2;
+var surVerglas = false;
+
 export default class niveau3 extends Phaser.Scene {
+  constructor() {
+    super({
+      key: "niveau3"
+    });
+  }
 
-    constructor() {
-        super({
-            key: "niveau3"
-        });
-    }
+  preload() {
+    this.load.spritesheet("img_perso", "src/assets/dude.png", {
+      frameWidth: 166,
+      frameHeight: 205
+    });
 
-    preload() {
-    }
+    this.load.image("img_glace", "src/assets/glace.png");
+    this.load.image("img_choco", "src/assets/collect_choco.png");
+    this.load.image("img_porte_sortie", "src/assets/door_exit.png");
+
+    // Mets ici les bons chemins de ton niveau 3
+    this.load.image("fondneige", "src/assets/fondneige.png");
+    this.load.image("blocneige", "src/assets/blocneige.png");
+    this.load.image("objetneige", "src/assets/objetneige.png");
+    this.load.tilemapTiledJSON("map_montagne", "src/assets/map_montagne.tmj");
+  }
 
   create() {
     gameOver = false;
     sautCount = 0;
     score = 0;
+    invulnerable = false;
+    surVerglas = false;
+
+    if (this.registry.get("vies") === undefined) {
+      this.registry.set("vies", 3);
+    }
 
     const carteDuNiveau = this.add.tilemap("map_montagne");
 
@@ -51,8 +83,8 @@ export default class niveau3 extends Phaser.Scene {
     player = this.physics.add.sprite(100, 100, "img_perso");
     player.setCollideWorldBounds(true);
     player.setBounce(0.2);
+    player.setScale(0.2);
 
-    // Réglages de base du déplacement
     player.setMaxVelocity(200, 500);
     player.setDragX(1200);
 
@@ -61,28 +93,44 @@ export default class niveau3 extends Phaser.Scene {
 
     clavier = this.input.keyboard.createCursorKeys();
 
-    this.anims.create({
-      key: "anim_tourne_gauche",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
+    if (!this.anims.exists("anim_tourne_gauche")) {
+      this.anims.create({
+        key: "anim_tourne_gauche",
+        frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
 
-    this.anims.create({
-      key: "anim_tourne_droite",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1
-    });
+    if (!this.anims.exists("anim_tourne_droite")) {
+      this.anims.create({
+        key: "anim_tourne_droite",
+        frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
 
-    this.anims.create({
-      key: "anim_face",
-      frames: [{ key: "img_perso", frame: 4 }],
-      frameRate: 20
-    });
+    if (!this.anims.exists("anim_face")) {
+      this.anims.create({
+        key: "anim_face",
+        frames: [{ key: "img_perso", frame: 4 }],
+        frameRate: 20
+      });
+    }
 
-    this.physics.world.setBounds(0, 0, 3200, 960);
-    this.cameras.main.setBounds(0, 0, 3200, 960);
+    this.physics.world.setBounds(
+      0,
+      0,
+      carteDuNiveau.widthInPixels,
+      carteDuNiveau.heightInPixels
+    );
+    this.cameras.main.setBounds(
+      0,
+      0,
+      carteDuNiveau.widthInPixels,
+      carteDuNiveau.heightInPixels
+    );
     this.cameras.main.startFollow(player);
 
     texteScore = this.add.text(16, 16, "Score : " + score, {
@@ -93,7 +141,12 @@ export default class niveau3 extends Phaser.Scene {
     texteScore.setScrollFactor(0);
     texteScore.setDepth(100);
 
-    // ===== GLACES : pareil que niveau 1 et 2 =====
+    texteVies = this.add.text(16, 50, "❤️".repeat(this.registry.get("vies")), {
+      fontSize: "28px"
+    });
+    texteVies.setScrollFactor(0);
+    texteVies.setDepth(100);
+
     this.glaces = this.physics.add.group();
     this.maxGlacesEcran = 4;
 
@@ -271,23 +324,48 @@ function ramasserChocolat(player, chocolat) {
 }
 
 function toucheGlace(player, glace) {
-  if (gameOver) return;
+  if (gameOver || invulnerable) return;
 
-  gameOver = true;
+  invulnerable = true;
+  glace.destroy();
 
-  this.physics.pause();
-  this.timerGlace.remove();
+  let vies = this.registry.get("vies");
+  vies -= 1;
+  this.registry.set("vies", vies);
 
+  texteVies.setText("❤️".repeat(vies));
   player.setTint(0xff0000);
+
+  if (vies <= 0) {
+    gameOver = true;
+    this.physics.pause();
+    this.timerGlace.remove();
+
+    this.add.text(player.x - 100, player.y - 80, "GAME OVER", {
+      fontSize: "48px",
+      fill: "#ff0000",
+      backgroundColor: "#000000"
+    }).setDepth(100);
+
+    this.time.delayedCall(1500, () => {
+      this.registry.set("vies", 3);
+      score = 0;
+      this.scene.start("niveau1");
+    });
+
+    return;
+  }
 
   this.tweens.add({
     targets: player,
-    alpha: 0,
-    duration: 500
+    alpha: 0.3,
+    duration: 100,
+    yoyo: true,
+    repeat: 5,
+    onComplete: () => {
+      player.setAlpha(1);
+      player.clearTint();
+      invulnerable = false;
+    }
   });
-
-  this.add.text(player.x - 100, player.y - 50, "GAME OVER", {
-    fontSize: "48px",
-    fill: "#ff0000"
-  }).setDepth(100);
 }
