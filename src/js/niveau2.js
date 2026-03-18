@@ -245,13 +245,13 @@ function spawnGlace() {
 
   var glace = this.glaces.create(x, y, "img_glace");
 
-  glace.setScale(0.7);
-  glace.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-  glace.setBounceX(0.2);
-  glace.setVelocity(
-    Phaser.Math.Between(-50, 50),
-    Phaser.Math.Between(120, 180)
-  );
+glace.setScale(0.7);
+glace.setCollideWorldBounds(true);
+glace.setBounce(1, 1);
+glace.setVelocity(
+  Phaser.Math.Between(-50, 50),
+  Phaser.Math.Between(120, 180)
+);
 }
 
 function ramasserChocolat(player, chocolat) {
