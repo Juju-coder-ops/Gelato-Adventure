@@ -1,9 +1,9 @@
-import * as fct from "/src/js/fonctions.js";
 var player;
 var clavier;
 var gameOver = false;
 var sautCount = 0;
-
+var texteVies;
+var invulnerable = false;
 
 export default class niveau1 extends Phaser.Scene {
   // constructeur de la classe
@@ -12,7 +12,6 @@ export default class niveau1 extends Phaser.Scene {
       key: "niveau1" //  ici on précise le nom de la classe en tant qu'identifiant
     });
   }
-
 
   preload() {
     this.load.spritesheet("img_perso", "src/assets/dude.png", {
@@ -26,11 +25,19 @@ export default class niveau1 extends Phaser.Scene {
     this.load.image("Phaser_tuile_ancien", "src/assets/tuile_ancien.png");
     this.load.image("img_porte_sortie", "src/assets/door_exit.png");
 
-
     this.load.tilemapTiledJSON("map_jeu_glace", "src/assets/map_jeu_glace.tmj");
   }
 
   create() {
+    gameOver = false;
+    sautCount = 0;
+    invulnerable = false;
+
+    // initialise les vies si elles n'existent pas encore
+    if (this.registry.get("vies") === undefined) {
+      this.registry.set("vies", 3);
+    }
+
     const carteDuNiveau = this.add.tilemap("map_jeu_glace");
 
     const tilesetAncien = carteDuNiveau.addTilesetImage("tuile_ancien", "Phaser_tuile_ancien");
@@ -67,33 +74,47 @@ export default class niveau1 extends Phaser.Scene {
     this.physics.add.collider(player, calque_plateformes);
     this.physics.add.collider(player, calque_sol);
 
-
     clavier = this.input.keyboard.createCursorKeys();
 
     // animations
-    this.anims.create({
-      key: "anim_tourne_gauche",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
+    if (!this.anims.exists("anim_tourne_gauche")) {
+      this.anims.create({
+        key: "anim_tourne_gauche",
+        frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
 
-    this.anims.create({
-      key: "anim_tourne_droite",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1
-    });
+    if (!this.anims.exists("anim_tourne_droite")) {
+      this.anims.create({
+        key: "anim_tourne_droite",
+        frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
 
-    this.anims.create({
-      key: "anim_face",
-      frames: [{ key: "img_perso", frame: 4 }],
-      frameRate: 20
-    });
+    if (!this.anims.exists("anim_face")) {
+      this.anims.create({
+        key: "anim_face",
+        frames: [{ key: "img_perso", frame: 4 }],
+        frameRate: 20
+      });
+    }
 
     this.physics.world.setBounds(0, 0, 3000, 960);
     this.cameras.main.setBounds(0, 0, 3000, 960);
     this.cameras.main.startFollow(player);
+
+    // affichage des vies
+    texteVies = this.add.text(16, 16, "Vies : " + this.registry.get("vies"), {
+      fontSize: "24px",
+      fill: "#ffffff",
+      backgroundColor: "#000000"
+    });
+    texteVies.setScrollFactor(0);
+    texteVies.setDepth(100);
 
     // groupe de glaces
     this.glaces = this.physics.add.group();
@@ -113,7 +134,6 @@ export default class niveau1 extends Phaser.Scene {
 
     this.porte_sortie = this.physics.add.staticSprite(2850, 700, "img_porte_sortie");
 
-
     this.add.text(2700, 620, "Appuie sur ESPACE", {
       fontSize: "18px",
       fill: "#ffffff",
@@ -123,7 +143,6 @@ export default class niveau1 extends Phaser.Scene {
 
   update() {
     if (gameOver) return;
-
     if (!clavier || !player) return;
 
     if (clavier.right.isDown) {
@@ -136,6 +155,7 @@ export default class niveau1 extends Phaser.Scene {
       player.setVelocityX(0);
       player.anims.play("anim_face");
     }
+
     if (player.body.blocked.down) {
       sautCount = 0;
     }
@@ -144,11 +164,13 @@ export default class niveau1 extends Phaser.Scene {
       player.setVelocityY(-320);
       sautCount++;
     }
+
     if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
       if (this.physics.overlap(player, this.porte_sortie)) {
         this.scene.start("niveau2");
       }
     }
+
     this.glaces.children.each(function (glace) {
       if (glace.y > 1200) {
         glace.destroy();
@@ -156,6 +178,7 @@ export default class niveau1 extends Phaser.Scene {
     });
   }
 }
+
 function spawnGlace() {
   if (gameOver) return;
 
@@ -200,24 +223,63 @@ function spawnGlace() {
 }
 
 function toucheGlace(player, glace) {
-  if (gameOver) return;
+  if (gameOver || invulnerable) return;
 
-  gameOver = true;
+  invulnerable = true;
 
-  this.physics.pause();
-  this.timerGlace.remove();
+  // on détruit la glace touchée
+  glace.destroy();
+
+  let vies = this.registry.get("vies");
+  vies -= 1;
+  this.registry.set("vies", vies);
+
+  texteVies.setText("Vies : " + vies);
 
   player.setTint(0xff0000);
 
-  this.tweens.add({
-    targets: player,
-    alpha: 0,
-    duration: 500
+  const textePerteVie = this.add.text(player.x - 40, player.y - 50, "-1 vie", {
+    fontSize: "24px",
+    fill: "#ff0000",
+    backgroundColor: "#000000"
+  }).setDepth(100);
+
+  this.time.delayedCall(600, () => {
+    if (textePerteVie) {
+      textePerteVie.destroy();
+    }
   });
 
-  this.add.text(player.x - 100, player.y - 50, "GAME OVER", {
-    fontSize: "48px",
-    fill: "#ff0000"
-  }).setDepth(100);
-}
+  // si le joueur n'a plus de vies
+  if (vies <= 0) {
+    gameOver = true;
+    this.physics.pause();
 
+    this.add.text(player.x - 100, player.y - 100, "GAME OVER", {
+      fontSize: "48px",
+      fill: "#ff0000",
+      backgroundColor: "#000000"
+    }).setDepth(100);
+
+    this.time.delayedCall(1500, () => {
+      this.registry.set("vies", 3);
+      this.scene.start("niveau1");
+    });
+
+    return;
+  }
+
+  // clignotement + invincibilité temporaire
+  this.tweens.add({
+    targets: player,
+    alpha: 0.3,
+    duration: 100,
+    yoyo: true,
+    repeat: 5,
+    onComplete: () => {
+      player.setAlpha(1);
+      player.clearTint();
+      invulnerable = false;
+    }
+  });
+}
