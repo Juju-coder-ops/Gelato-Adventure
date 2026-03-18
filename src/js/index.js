@@ -1,9 +1,14 @@
+import accueil from "./accueil.js";
 import niveau1 from "./niveau1.js";
-import accueil from "./accueil.js"
+
 var config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  scale: {
+    mode: Phaser.Scale.FIT,          // adapte le jeu à l'écran
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 800,
+    height: 600
+  },
   backgroundColor: "#87ceeb",
   physics: {
     default: "arcade",

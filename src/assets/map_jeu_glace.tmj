@@ -36,7 +36,7 @@
          "height":30,
          "id":5,
          "name":"fond",
-         "opacity":0,
+         "opacity":1,
          "properties":[
                 {
                  "name":"estSolide",
