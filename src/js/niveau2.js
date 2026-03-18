@@ -3,13 +3,14 @@ var clavier;
 var gameOver = false;
 var score = 0;
 var texteScore;
+var texteVies;
 var sautCount = 0;
+var invulnerable = false;
 
 export default class niveau2 extends Phaser.Scene {
-  // constructeur de la classe
   constructor() {
     super({
-      key: "niveau2" //  ici on précise le nom de la classe en tant qu'identifiant
+      key: "niveau2"
     });
   }
 
@@ -28,6 +29,10 @@ export default class niveau2 extends Phaser.Scene {
   }
 
   create() {
+    gameOver = false;
+    sautCount = 0;
+    invulnerable = false;
+
     const carteDuNiveau = this.add.tilemap("map_foret");
     const tilesetForet = carteDuNiveau.addTilesetImage("foret", "tileset_foret");
 
@@ -48,37 +53,49 @@ export default class niveau2 extends Phaser.Scene {
 
     clavier = this.input.keyboard.createCursorKeys();
 
-    this.anims.create({
-      key: "anim_tourne_gauche",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
+    if (!this.anims.exists("anim_tourne_gauche")) {
+      this.anims.create({
+        key: "anim_tourne_gauche",
+        frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
 
-    this.anims.create({
-      key: "anim_tourne_droite",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1
-    });
+    if (!this.anims.exists("anim_tourne_droite")) {
+      this.anims.create({
+        key: "anim_tourne_droite",
+        frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    }
 
-    this.anims.create({
-      key: "anim_face",
-      frames: [{ key: "img_perso", frame: 4 }],
-      frameRate: 20
-    });
+    if (!this.anims.exists("anim_face")) {
+      this.anims.create({
+        key: "anim_face",
+        frames: [{ key: "img_perso", frame: 4 }],
+        frameRate: 20
+      });
+    }
 
     this.physics.world.setBounds(0, 0, carteDuNiveau.widthInPixels, carteDuNiveau.heightInPixels);
     this.cameras.main.setBounds(0, 0, carteDuNiveau.widthInPixels, carteDuNiveau.heightInPixels);
     this.cameras.main.startFollow(player);
 
-    texteScore = this.add.text(16, 16, "Score : 0", {
+    texteScore = this.add.text(16, 16, "Score : " + score, {
       fontSize: "24px",
       fill: "#ffffff",
       backgroundColor: "#000000"
     });
     texteScore.setScrollFactor(0);
     texteScore.setDepth(100);
+
+    texteVies = this.add.text(16, 50, "❤️".repeat(this.registry.get("vies")), {
+      fontSize: "28px"
+    });
+    texteVies.setScrollFactor(0);
+    texteVies.setDepth(100);
 
     this.glaces = this.physics.add.group();
     this.maxGlacesEcran = 4;
@@ -118,7 +135,6 @@ export default class niveau2 extends Phaser.Scene {
 
     this.porte_sortie = this.physics.add.staticSprite(2850, 700, "img_porte_sortie");
 
-
     this.add.text(2700, 620, "Appuie sur ESPACE", {
       fontSize: "18px",
       fill: "#ffffff",
@@ -126,11 +142,10 @@ export default class niveau2 extends Phaser.Scene {
     });
 
     this.textePorte = this.add.text(2600, 580, "", {
-  fontSize: "18px",
-  fill: "#ff0000",
-  backgroundColor: "#000000"
-});
-
+      fontSize: "18px",
+      fill: "#ff0000",
+      backgroundColor: "#000000"
+    });
   }
 
   update() {
@@ -156,35 +171,30 @@ export default class niveau2 extends Phaser.Scene {
       player.setVelocityY(-320);
       sautCount++;
     }
-    if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
-    if (this.physics.overlap(player, this.porte_sortie)) {
-    if (this.chocolats.countActive(true) === 0) {
-      this.scene.start("niveau3");
-    }
-  }
-}
+
     this.glaces.children.each(function (glace) {
       if (glace.y > 1200) {
         glace.destroy();
       }
     });
-    if (this.physics.overlap(player, this.porte_sortie)) {
-  if (this.chocolats.countActive(true) === 0) {
-    this.textePorte.setText("Appuie sur ESPACE pour passer");
-  } else {
-    this.textePorte.setText("Ramasse tous les chocolats");
-  }
-} else {
-  this.textePorte.setText("");
-}
 
-if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
-  if (this.physics.overlap(player, this.porte_sortie)) {
-    if (this.chocolats.countActive(true) === 0) {
-      this.scene.start("niveau3");
+    if (this.physics.overlap(player, this.porte_sortie)) {
+      if (this.chocolats.countActive(true) === 0) {
+        this.textePorte.setText("Appuie sur ESPACE pour passer");
+      } else {
+        this.textePorte.setText("Ramasse tous les chocolats");
+      }
+    } else {
+      this.textePorte.setText("");
     }
-  }
-}
+
+    if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+      if (this.physics.overlap(player, this.porte_sortie)) {
+        if (this.chocolats.countActive(true) === 0) {
+          this.scene.start("niveau3");
+        }
+      }
+    }
   }
 }
 
@@ -196,7 +206,6 @@ function spawnGlace() {
   var largeurCamera = this.cameras.main.width;
   var hauteurCamera = this.cameras.main.height;
 
-  // compter les glaces déjà visibles
   var nbGlacesVisibles = 0;
 
   this.glaces.children.each(function (glace) {
@@ -211,12 +220,10 @@ function spawnGlace() {
     }
   });
 
-  // si il y en a déjà trop, on arrête
   if (nbGlacesVisibles >= this.maxGlacesEcran) {
     return;
   }
 
-  // sinon on crée une nouvelle glace dans la zone visible
   var x = Phaser.Math.Between(cameraX, cameraX + largeurCamera);
   var y = cameraY - 50;
 
@@ -238,22 +245,49 @@ function ramasserChocolat(player, chocolat) {
 }
 
 function toucheGlace(player, glace) {
-  if (gameOver) return;
+  if (gameOver || invulnerable) return;
 
-  gameOver = true;
-  this.physics.pause();
-  this.timerGlace.remove();
+  invulnerable = true;
+  glace.destroy();
+
+  let vies = this.registry.get("vies");
+  vies -= 1;
+  this.registry.set("vies", vies);
+
+  texteVies.setText("❤️".repeat(vies));
 
   player.setTint(0xff0000);
 
+  if (vies <= 0) {
+    gameOver = true;
+    this.physics.pause();
+    this.timerGlace.remove();
+
+    this.add.text(player.x - 100, player.y - 80, "GAME OVER", {
+      fontSize: "48px",
+      fill: "#ff0000",
+      backgroundColor: "#000000"
+    }).setDepth(100);
+
+    this.time.delayedCall(1500, () => {
+      this.registry.set("vies", 3);
+      score = 0;
+      this.scene.start("niveau1");
+    });
+
+    return;
+  }
+
   this.tweens.add({
     targets: player,
-    alpha: 0,
-    duration: 500
+    alpha: 0.3,
+    duration: 100,
+    yoyo: true,
+    repeat: 5,
+    onComplete: () => {
+      player.setAlpha(1);
+      player.clearTint();
+      invulnerable = false;
+    }
   });
-
-  this.add.text(player.x - 100, player.y - 50, "GAME OVER", {
-    fontSize: "48px",
-    fill: "#ff0000"
-  }).setDepth(100);
 }
