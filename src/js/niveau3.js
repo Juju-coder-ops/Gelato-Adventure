@@ -77,7 +77,7 @@ export default class niveau3 extends Phaser.Scene {
 
     // Réglages de base du déplacement
     player.setMaxVelocity(200, 500);
-    player.setDragX(1200);
+    player.setDragX(5);
 
     this.physics.add.collider(player, calqueVerglas1);
     this.physics.add.collider(player, calqueVerglas2);
@@ -175,27 +175,7 @@ export default class niveau3 extends Phaser.Scene {
     if (gameOver) return;
     if (!clavier || !player) return;
 
-    const xPieds = player.x;
-    const yPieds = player.body.bottom + 2;
-
-    const tuile1 = calqueVerglas1.getTileAtWorldXY(xPieds, yPieds, true);
-    const tuile2 = calqueVerglas2.getTileAtWorldXY(xPieds, yPieds, true);
-
-    surVerglas = false;
-
-    if (tuile1 && tuile1.properties && tuile1.properties.estVerglas) {
-      surVerglas = true;
-    }
-
-    if (tuile2 && tuile2.properties && tuile2.properties.estVerglas) {
-      surVerglas = true;
-    }
-
-    if (surVerglas) {
-      player.setDragX(10);
-    } else {
-      player.setDragX(1200);
-    }
+    player.setDragX(2);
 
     if (clavier.right.isDown) {
       player.setAccelerationX(600);
