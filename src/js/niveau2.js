@@ -45,7 +45,8 @@ export default class niveau2 extends Phaser.Scene {
 
     calque_foret.setCollisionByProperty({ estSolide: true });
 
-    player = this.physics.add.sprite(100, 100, "img_perso");
+    // joueur plus bas au départ
+    player = this.physics.add.sprite(120, 620, "img_perso");
     player.setCollideWorldBounds(true);
     player.setBounce(0.2);
 
@@ -111,6 +112,7 @@ export default class niveau2 extends Phaser.Scene {
 
     this.chocolats = this.physics.add.group();
 
+    // chocolats qui tombent du ciel comme avant
     var positionsChoco = [
       { x: 200, y: 0 },
       { x: 350, y: 0 },
