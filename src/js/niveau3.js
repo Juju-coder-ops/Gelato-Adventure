@@ -4,6 +4,7 @@ var gameOver = false;
 var surVerglas = false;
 var calqueVerglas1;
 var calqueVerglas2;
+var sautCount = 0;
 
 export default class niveau3 extends Phaser.Scene {
   constructor() {
@@ -144,20 +145,8 @@ export default class niveau3 extends Phaser.Scene {
       surVerglas = true;
     }
 
-    // ==================================================
-    // ICI TU CHANGES LE NIVEAU DE GLISSE
-    //
-    // Plus la valeur est PETITE, plus ça glisse
-    // Plus la valeur est GRANDE, moins ça glisse
-    //
-    // Exemples :
-    // 100 = un peu glissant
-    // 50 = bien glissant
-    // 20 = très glissant
-    // 5 = ça glisse énormément
-    // ==================================================
     if (surVerglas) {
-      player.setDragX(20);
+      player.setDragX(10);
     } else {
       player.setDragX(1200);
     }
@@ -177,8 +166,13 @@ export default class niveau3 extends Phaser.Scene {
       }
     }
 
-    if (clavier.up.isDown && player.body.blocked.down) {
-      player.setVelocityY(-250);
+    if (player.body.blocked.down) {
+      sautCount = 0;
+    }
+
+    if (Phaser.Input.Keyboard.JustDown(clavier.up) && sautCount < 2) {
+      player.setVelocityY(-320);
+      sautCount++;
     }
 
     if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
