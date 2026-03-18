@@ -133,7 +133,7 @@ export default class niveau2 extends Phaser.Scene {
     this.physics.add.collider(this.chocolats, calque_foret);
     this.physics.add.overlap(player, this.chocolats, ramasserChocolat, null, this);
 
-    this.porte_sortie = this.physics.add.staticSprite(2850, 700, "img_porte_sortie");
+    this.porte_sortie = this.physics.add.staticSprite(2725, 700, "img_porte_sortie");
 
     this.add.text(2700, 620, "Appuie sur ESPACE", {
       fontSize: "18px",
