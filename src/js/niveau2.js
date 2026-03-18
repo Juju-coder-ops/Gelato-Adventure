@@ -16,8 +16,8 @@ export default class niveau2 extends Phaser.Scene {
 
   preload() {
     this.load.spritesheet("img_perso", "src/assets/dude.png", {
-      frameWidth: 32,
-      frameHeight: 48
+      frameWidth: 166,
+      frameHeight: 205
     });
 
     this.load.image("img_glace", "src/assets/glace.png");
@@ -49,6 +49,7 @@ export default class niveau2 extends Phaser.Scene {
     player = this.physics.add.sprite(120, 620, "img_perso");
     player.setCollideWorldBounds(true);
     player.setBounce(0.2);
+    player.setScale(0.2);
 
     this.physics.add.collider(player, calque_foret);
 
