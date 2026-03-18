@@ -22,6 +22,7 @@ export default class niveau1 extends Phaser.Scene {
     this.load.image("Phaser_tuile_plage", "src/assets/tuile plage.png");
     this.load.image("Phaser_tuile_ancien", "src/assets/tuile_ancien.png");
     this.load.image("img_porte_sortie", "src/assets/door_exit.png");
+    
 
     this.load.tilemapTiledJSON("map_jeu_glace", "src/assets/map_jeu_glace.tmj");
   }
@@ -200,11 +201,11 @@ function spawnGlace() {
   var glace = this.glaces.create(x, y, "img_glace");
 
   glace.setScale(0.7);
-  glace.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-  glace.setBounceX(0.2);
+  glace.setCollideWorldBounds(true);
+  glace.setBounce(1, 1);
   glace.setVelocity(
-    Phaser.Math.Between(-50, 50),
-    Phaser.Math.Between(120, 180)
+  Phaser.Math.Between(-50, 50),
+  Phaser.Math.Between(120, 180)
   );
 }
 
