@@ -1,9 +1,14 @@
 
+var player;
+var clavier;
+var surVerglas = false;
+var calqueVerglas1;
+var calqueVerglas2;
+
 export default class niveau3 extends Phaser.Scene {
-  // constructeur de la classe
   constructor() {
     super({
-      key: "niveau3" //  ici on précise le nom de la classe en tant qu'identifiant
+      key: "niveau3"
     });
   }
 
@@ -28,7 +33,6 @@ create() {
 
   const carteDuNiveau = this.add.tilemap("map_montagne");
 
-  // 🔥 IMPORTANT : noms EXACTS de Tiled + tes clés
   const tilesetFond = carteDuNiveau.addTilesetImage(
     "ChatGPT Image 17 mars 2026, 11_15_41",
     "fondneige"
@@ -44,9 +48,8 @@ create() {
     "objetneige"
   );
 
-  console.log(tilesetFond, tilesetBloc, tilesetObjet);
+  console.log("Tilesets :", tilesetFond, tilesetBloc, tilesetObjet);
 
-  // TES CALQUES
   calqueVerglas1 = carteDuNiveau.createLayer(
     "Calque de Tuiles 1",
     [tilesetFond, tilesetBloc, tilesetObjet],
@@ -61,10 +64,10 @@ create() {
     0
   );
 
-console.log(calqueVerglas1, calqueVerglas2);
+  console.log("Calques :", calqueVerglas1, calqueVerglas2);
 
-calqueVerglas1.setCollisionByProperty({ estSolide: true });
-calqueVerglas2.setCollisionByProperty({ estSolide: true });
+  calqueVerglas1.setCollisionByProperty({ estSolide: true });
+  calqueVerglas2.setCollisionByProperty({ estSolide: true });
 
   player = this.physics.add.sprite(100, 100, "img_perso");
   player.setCollideWorldBounds(true);
