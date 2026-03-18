@@ -21,6 +21,7 @@ export default class niveau2 extends Phaser.Scene {
 
   this.load.image("img_glace", "src/assets/glace.png");
   this.load.image("img_choco", "src/assets/collect_choco.png");
+  this.load.image("img_porte_sortie", "src/assets/door_exit.png");
 
   this.load.image("tileset_foret", "src/assets/foret.jpg");
   this.load.tilemapTiledJSON("map_foret", "src/assets/forest.tmj");
@@ -113,6 +114,16 @@ create() {
 
   this.physics.add.collider(this.chocolats, calque_foret);
   this.physics.add.overlap(player, this.chocolats, ramasserChocolat, null, this);
+     
+  this.porte_sortie = this.physics.add.staticSprite(2850, 700, "img_porte_sortie");
+
+
+    this.add.text(2700, 620, "Appuie sur ESPACE", {
+    fontSize: "18px",
+    fill: "#ffffff",
+    backgroundColor: "#000000"
+  });
+
 }
 
  update() {
@@ -138,6 +149,11 @@ create() {
     player.setVelocityY(-320);
     sautCount++;
   }
+  if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+  if (this.physics.overlap(player, this.porte_sortie)) {
+    this.scene.start("niveau3");
+  }
+}
 }
 
 }
