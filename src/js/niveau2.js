@@ -23,6 +23,7 @@ export default class niveau2 extends Phaser.Scene {
     this.load.image("img_glace", "src/assets/glace.png");
     this.load.image("img_choco", "src/assets/collect_choco.png");
     this.load.image("img_porte_sortie", "src/assets/door_exit.png");
+    this.load.image("img_balle", "src/assets/balle.png");
 
     this.load.image("tileset_foret", "src/assets/foret.jpg");
     this.load.tilemapTiledJSON("map_foret", "src/assets/forest.tmj");
@@ -126,6 +127,14 @@ export default class niveau2 extends Phaser.Scene {
     this.physics.add.collider(this.glaces, calque_foret);
     this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
 
+    this.balles = this.physics.add.group();
+
+    this.physics.add.overlap(this.balles, this.glaces, detruireGlace, null, this);
+
+    this.toucheTir = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
+    this.directionJoueur = "droite";
+    this.lastShot = 0;
+
     this.timerGlace = this.time.addEvent({
       delay: 2000,
       callback: spawnGlace,
@@ -183,9 +192,11 @@ export default class niveau2 extends Phaser.Scene {
     if (clavier.right.isDown) {
       player.setVelocityX(160);
       player.anims.play("anim_tourne_droite", true);
+      this.directionJoueur = "droite";
     } else if (clavier.left.isDown) {
       player.setVelocityX(-160);
       player.anims.play("anim_tourne_gauche", true);
+      this.directionJoueur = "gauche";
     } else {
       player.setVelocityX(0);
       player.anims.play("anim_face");
@@ -217,6 +228,12 @@ export default class niveau2 extends Phaser.Scene {
         if (this.chocolats.countActive(true) === 0) {
           this.scene.start("niveau3");
         }
+      }
+    }
+    if (Phaser.Input.Keyboard.JustDown(this.toucheTir)) {
+      if (this.time.now > this.lastShot + 300) {
+        tirerBalle.call(this);
+        this.lastShot = this.time.now;
       }
     }
   }
@@ -253,13 +270,13 @@ function spawnGlace() {
 
   var glace = this.glaces.create(x, y, "img_glace");
 
-glace.setScale(0.7);
-glace.setCollideWorldBounds(true);
-glace.setBounce(0.75, 0.75);
-glace.setVelocity(
-  Phaser.Math.Between(-50, 50),
-  Phaser.Math.Between(120, 180)
-);
+  glace.setScale(0.7);
+  glace.setCollideWorldBounds(true);
+  glace.setBounce(0.75, 0.75);
+  glace.setVelocity(
+    Phaser.Math.Between(-50, 50),
+    Phaser.Math.Between(120, 180)
+  );
 }
 
 function ramasserChocolat(player, chocolat) {
@@ -313,4 +330,32 @@ function toucheGlace(player, glace) {
       invulnerable = false;
     }
   });
+}
+
+function tirerBalle() {
+  let xBalle;
+
+  if (this.directionJoueur === "droite") {
+    xBalle = player.x + 30;
+  } else {
+    xBalle = player.x - 30;
+  }
+
+  var balle = this.balles.create(xBalle, player.y, "img_balle");
+
+  balle.setScale(0.5);
+  balle.setDepth(200);
+  balle.setCollideWorldBounds(false);
+  balle.body.allowGravity = false;
+
+  if (this.directionJoueur === "droite") {
+    balle.setVelocityX(500);
+  } else {
+    balle.setVelocityX(-500);
+  }
+}
+
+function detruireGlace(balle, glace) {
+  balle.destroy();
+  glace.destroy();
 }
