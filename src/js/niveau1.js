@@ -202,7 +202,7 @@ function spawnGlace() {
 
   glace.setScale(0.7);
   glace.setCollideWorldBounds(true);
-  glace.setBounce(1, 1);
+  glace.setBounce(0.5, 0.5);
   glace.setVelocity(
   Phaser.Math.Between(-50, 50),
   Phaser.Math.Between(120, 180)

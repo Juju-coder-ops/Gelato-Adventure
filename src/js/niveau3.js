@@ -33,6 +33,7 @@ export default class niveau3 extends Phaser.Scene {
     this.load.image("blocneige", "src/assets/blocneige.png");
     this.load.image("objetneige", "src/assets/objetneige.png");
     this.load.tilemapTiledJSON("map_montagne", "src/assets/map_montagne.tmj");
+    this.load.audio("musique_fond", "src/assets/musique.mp3"); // Ajoutez cette ligne pour charger l'audio
   }
 
   create() {
@@ -203,6 +204,9 @@ export default class niveau3 extends Phaser.Scene {
       fill: "#ff0000",
       backgroundColor: "#000000"
     });
+
+    this.musique = this.sound.add("musique_fond", { loop: true, volume: 0.5 }); // Créez l'objet audio
+    this.musique.play(); // Jouez la musique
   }
 
   update() {
@@ -217,11 +221,11 @@ export default class niveau3 extends Phaser.Scene {
 
     surVerglas = false;
 
-    if (tuile1 && tuile1.properties && tuile1.properties.estVerglas) {
+    if (tuile1 && tuile1.collides) {
       surVerglas = true;
     }
 
-    if (tuile2 && tuile2.properties && tuile2.properties.estVerglas) {
+    if (tuile2 && tuile2.collides) {
       surVerglas = true;
     }
 
@@ -314,7 +318,7 @@ function spawnGlace() {
 
 glace.setScale(0.7);
 glace.setCollideWorldBounds(true);
-glace.setBounce(1, 1);
+glace.setBounce(0.5, 0.5);
 glace.setVelocity(
   Phaser.Math.Between(-50, 50),
   Phaser.Math.Between(120, 180)
@@ -356,6 +360,8 @@ function toucheGlace(player, glace) {
       score = 0;
       this.scene.start("niveau1");
     });
+
+    this.musique.stop(); // Arrêtez la musique au game over
 
     return;
   }
