@@ -235,7 +235,7 @@ function toucheGlace(player, glace) {
     }).setDepth(100);
 
     this.time.delayedCall(1500, () => {
-      this.registry.set("vies", 3);
+      this.registry.set("vies", 5);
       this.scene.start("niveau1");
     });
 
