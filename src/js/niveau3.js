@@ -231,13 +231,13 @@ this.lastShot = 0;
     const tuile1 = calqueVerglas1.getTileAtWorldXY(xPieds, yPieds, true);
     const tuile2 = calqueVerglas2.getTileAtWorldXY(xPieds, yPieds, true);
 
-    surVerglas = false;
+ surVerglas = false;
 
-    if (tuile1 && tuile1.collides) {
+    if (tuile1 && tuile1.properties && tuile1.properties.estVerglas) {
       surVerglas = true;
     }
 
-    if (tuile2 && tuile2.collides) {
+    if (tuile2 && tuile2.properties && tuile2.properties.estVerglas) {
       surVerglas = true;
     }
 
@@ -247,17 +247,21 @@ this.lastShot = 0;
       player.setDragX(1200);
     }
 
-   if (clavier.right.isDown) {
-  player.setVelocityX(160);
+if (clavier.right.isDown) {
+  player.setAccelerationX(600);
   player.anims.play("anim_tourne_droite", true);
   this.directionJoueur = "droite";
 } else if (clavier.left.isDown) {
-  player.setVelocityX(-160);
+  player.setAccelerationX(-600);
   player.anims.play("anim_tourne_gauche", true);
   this.directionJoueur = "gauche";
 } else {
-  player.setVelocityX(0);
-  player.anims.play("anim_face");
+  player.setAccelerationX(0);
+
+  if (Math.abs(player.body.velocity.x) < 5) {
+    player.setVelocityX(0);
+    player.anims.play("anim_face");
+  }
 }
 
     if (player.body.blocked.down) {
