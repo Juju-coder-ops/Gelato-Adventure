@@ -136,20 +136,25 @@ export default class niveau3 extends Phaser.Scene {
     this.cameras.main.startFollow(player);
 
     texteScore = this.add.text(16, 16, "Score : 0/10", {
-      fontSize: "18px", // Smaller and more elegant font size
+      fontSize: "18px",
       fill: "#ffffff",
-      fontFamily: "Arial", // Elegant font style
-      backgroundColor: "#000000"
+      fontFamily: "Arial"
     });
     texteScore.setScrollFactor(0);
     texteScore.setDepth(100);
 
     texteVies = this.add.text(16, 50, "❤️".repeat(this.registry.get("vies")), {
-      fontSize: "20px", // Smaller font size for lives
-      fontFamily: "Arial" // Elegant font style
+      fontSize: "20px",
+      fontFamily: "Arial"
     });
     texteVies.setScrollFactor(0);
     texteVies.setDepth(100);
+
+    this.add.text(16, 80, "récupère tous les chocolats en évitant le sol glissant", {
+      fontSize: "12px",
+      fill: "#ffffff",
+      fontFamily: "Arial"
+    }).setScrollFactor(0).setDepth(100);
 
     this.glaces = this.physics.add.group();
     this.maxGlacesEcran = 4;
@@ -204,14 +209,12 @@ this.lastShot = 0;
 
     this.add.text(2850, 620, "Appuie sur ESPACE", {
       fontSize: "18px",
-      fill: "#ffffff",
-      backgroundColor: "#000000"
+      fill: "#ffffff"
     });
 
     this.textePorte = this.add.text(2600, 580, "", {
       fontSize: "18px",
-      fill: "#ff0000",
-      backgroundColor: "#000000"
+      fill: "#ff0000"
     });
 
     //this.musique = this.sound.add("musique_fond", { loop: true, volume: 0.5 }); // Créez l'objet audio
@@ -366,8 +369,7 @@ function toucheGlace(player, glace) {
 
     this.add.text(player.x - 100, player.y - 80, "GAME OVER", {
       fontSize: "48px",
-      fill: "#ff0000",
-      backgroundColor: "#000000"
+      fill: "#ff0000"
     }).setDepth(100);
 
     this.time.delayedCall(1500, () => {

@@ -109,6 +109,13 @@ export default class niveau1 extends Phaser.Scene {
     texteVies.setScrollFactor(0);
     texteVies.setDepth(100);
 
+    // Affichage des consignes
+    this.add.text(16, 50, "Évite toutes les glaces et atteins la porte", {
+      fontSize: "20px",
+      fill: "#ffffff",
+      fontFamily: "Arial"
+    }).setScrollFactor(0).setDepth(100);
+
     this.glaces = this.physics.add.group();
     this.maxGlacesEcran = 4;
 
@@ -127,8 +134,7 @@ export default class niveau1 extends Phaser.Scene {
 
     this.add.text(2700, 620, "Appuie sur ESPACE", {
       fontSize: "18px",
-      fill: "#ffffff",
-      backgroundColor: "#000000"
+      fill: "#ffffff"
     });
 
     this.balles = this.physics.add.group();
@@ -248,8 +254,7 @@ function toucheGlace(player, glace) {
 
     this.add.text(player.x - 100, player.y - 80, "GAME OVER", {
       fontSize: "48px",
-      fill: "#ff0000",
-      backgroundColor: "#000000"
+      fill: "#ff0000"
     }).setDepth(100);
 
     this.time.delayedCall(1500, () => {
