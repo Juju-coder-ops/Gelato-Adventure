@@ -205,8 +205,8 @@ export default class niveau3 extends Phaser.Scene {
       backgroundColor: "#000000"
     });
 
-    this.musique = this.sound.add("musique_fond", { loop: true, volume: 0.5 }); // Créez l'objet audio
-    this.musique.play(); // Jouez la musique
+    //this.musique = this.sound.add("musique_fond", { loop: true, volume: 0.5 }); // Créez l'objet audio
+    //this.musique.play(); // Jouez la musique
   }
 
   update() {
@@ -318,7 +318,7 @@ function spawnGlace() {
 
 glace.setScale(0.7);
 glace.setCollideWorldBounds(true);
-glace.setBounce(0.5, 0.5);
+glace.setBounce(0.75, 0.75);
 glace.setVelocity(
   Phaser.Math.Between(-50, 50),
   Phaser.Math.Between(120, 180)
@@ -361,7 +361,7 @@ function toucheGlace(player, glace) {
       this.scene.start("niveau1");
     });
 
-    this.musique.stop(); // Arrêtez la musique au game over
+    //this.musique.stop(); // Arrêtez la musique au game over
 
     return;
   }
