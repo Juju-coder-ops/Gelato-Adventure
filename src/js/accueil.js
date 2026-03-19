@@ -59,7 +59,7 @@ export default class accueil extends Phaser.Scene {
 
         // commandes
         this.add.text(centerX, centerY + 110,
-            "Commandes : flèches pour bouger • ESPACE pour entrer dans une porte",
+            "Commandes : flèches pour bouger • ESPACE pour entrer dans une porte \n • F pour tirer",
             {
                 fontSize: "18px",
                 color: "#fff7e6",

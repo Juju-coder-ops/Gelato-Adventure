@@ -27,6 +27,7 @@ export default class niveau3 extends Phaser.Scene {
     this.load.image("img_glace", "src/assets/glace.png");
     this.load.image("img_choco", "src/assets/collect_choco.png");
     this.load.image("img_porte_sortie", "src/assets/door_exit.png");
+    this.load.image("img_balle", "src/assets/balle.png");
 
     // Mets ici les bons chemins de ton niveau 3
     this.load.image("fondneige", "src/assets/fondneige.png");
@@ -157,6 +158,14 @@ export default class niveau3 extends Phaser.Scene {
     this.physics.add.collider(this.glaces, calqueVerglas2);
     this.physics.add.overlap(player, this.glaces, toucheGlace, null, this);
 
+    this.balles = this.physics.add.group();
+
+this.physics.add.overlap(this.balles, this.glaces, detruireGlace, null, this);
+
+this.toucheTir = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
+this.directionJoueur = "droite";
+this.lastShot = 0;
+
     this.timerGlace = this.time.addEvent({
       delay: 2000,
       callback: spawnGlace,
@@ -235,20 +244,18 @@ export default class niveau3 extends Phaser.Scene {
       player.setDragX(1200);
     }
 
-    if (clavier.right.isDown) {
-      player.setAccelerationX(600);
-      player.anims.play("anim_tourne_droite", true);
-    } else if (clavier.left.isDown) {
-      player.setAccelerationX(-600);
-      player.anims.play("anim_tourne_gauche", true);
-    } else {
-      player.setAccelerationX(0);
-
-      if (Math.abs(player.body.velocity.x) < 5) {
-        player.setVelocityX(0);
-        player.anims.play("anim_face", true);
-      }
-    }
+   if (clavier.right.isDown) {
+  player.setVelocityX(160);
+  player.anims.play("anim_tourne_droite", true);
+  this.directionJoueur = "droite";
+} else if (clavier.left.isDown) {
+  player.setVelocityX(-160);
+  player.anims.play("anim_tourne_gauche", true);
+  this.directionJoueur = "gauche";
+} else {
+  player.setVelocityX(0);
+  player.anims.play("anim_face");
+}
 
     if (player.body.blocked.down) {
       sautCount = 0;
@@ -282,7 +289,15 @@ export default class niveau3 extends Phaser.Scene {
         glace.destroy();
       }
     });
+
+    if (Phaser.Input.Keyboard.JustDown(this.toucheTir)) {
+  if (this.time.now > this.lastShot + 300) {
+    tirerBalle.call(this);
+    this.lastShot = this.time.now;
   }
+}
+  }
+
 }
 
 function spawnGlace() {
@@ -378,4 +393,32 @@ function toucheGlace(player, glace) {
       invulnerable = false;
     }
   });
+}
+
+function tirerBalle() {
+  let xBalle;
+
+  if (this.directionJoueur === "droite") {
+    xBalle = player.x + 30;
+  } else {
+    xBalle = player.x - 30;
+  }
+
+  var balle = this.balles.create(xBalle, player.y, "img_balle");
+
+  balle.setScale(0.5);
+  balle.setDepth(200);
+  balle.setCollideWorldBounds(false);
+  balle.body.allowGravity = false;
+
+  if (this.directionJoueur === "droite") {
+    balle.setVelocityX(500);
+  } else {
+    balle.setVelocityX(-500);
+  }
+}
+
+function detruireGlace(balle, glace) {
+  balle.destroy();
+  glace.destroy();
 }
