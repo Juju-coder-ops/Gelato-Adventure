@@ -113,6 +113,14 @@ export default class niveau2 extends Phaser.Scene {
     texteVies.setScrollFactor(0);
     texteVies.setDepth(100);
 
+    // Add game rule text at the top of the screen
+    this.add.text(16, 80, "Récupère tous les chocolats et atteins la porte pour passer au niveau suivant", {
+      fontSize: "16px", // Smaller font size
+      fill: "#ffffff", // Keep the white color
+      fontFamily: "Arial", // Elegant font style
+      wordWrap: { width: 800 } // Keep word wrapping
+    }).setScrollFactor(0).setDepth(100);
+
     this.glaces = this.physics.add.group();
     this.maxGlacesEcran = 4;
     this.physics.add.collider(this.glaces, calque_foret);

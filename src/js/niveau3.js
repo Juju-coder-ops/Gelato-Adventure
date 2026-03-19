@@ -133,16 +133,18 @@ export default class niveau3 extends Phaser.Scene {
     );
     this.cameras.main.startFollow(player);
 
-    texteScore = this.add.text(16, 16, "Score : " + score, {
-      fontSize: "24px",
+    texteScore = this.add.text(16, 16, "Score : 0/10", {
+      fontSize: "18px", // Smaller and more elegant font size
       fill: "#ffffff",
+      fontFamily: "Arial", // Elegant font style
       backgroundColor: "#000000"
     });
     texteScore.setScrollFactor(0);
     texteScore.setDepth(100);
 
     texteVies = this.add.text(16, 50, "❤️".repeat(this.registry.get("vies")), {
-      fontSize: "28px"
+      fontSize: "20px", // Smaller font size for lives
+      fontFamily: "Arial" // Elegant font style
     });
     texteVies.setScrollFactor(0);
     texteVies.setDepth(100);
@@ -175,6 +177,8 @@ export default class niveau3 extends Phaser.Scene {
       { x: 1600, y: 0 },
       { x: 1800, y: 0 }
     ];
+
+    this.totalChocolats = positionsChoco.length; // Store total chocolates
 
     positionsChoco.forEach(function (pos) {
       var choco = this.chocolats.create(pos.x, pos.y, "img_choco");
@@ -319,8 +323,8 @@ glace.setVelocity(
 
 function ramasserChocolat(player, chocolat) {
   chocolat.destroy();
-  score += 10;
-  texteScore.setText("Score : " + score);
+  score += 1; // Increment score by 1
+  texteScore.setText(`Score : ${score}/${this.totalChocolats}`); // Update score format
 }
 
 function toucheGlace(player, glace) {
